@@ -20,3 +20,20 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.horizontal-div {
+  display: flex;
+}
+
+p {
+  margin-bottom: 0;
+  margin-top: .1em;
+}
+
+.criteria-list .btn {
+  margin-left: .4em;
+}
+
+.criteria-relation .criteria-relation-form .form-control {
+  margin-left: .3em;
+}
