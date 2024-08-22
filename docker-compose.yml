@@ -1,0 +1,6 @@
+﻿services:
+  decision-platform-web:
+    image: decision-platform-web
+    build:
+      context: .
+      dockerfile: decision-platform-web/Dockerfile
