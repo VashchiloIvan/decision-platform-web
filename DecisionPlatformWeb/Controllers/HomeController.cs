@@ -1,16 +1,20 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using decision_platform_web.Models;
+using DecisionPlatformWeb.Config;
+using DecisionPlatformWeb.Models;
+using Microsoft.Extensions.Options;
 
-namespace decision_platform_web.Controllers;
+namespace DecisionPlatformWeb.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly MultiCriteriaSolvingConfig _criteriaSolvingConfig;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, IOptions<MultiCriteriaSolvingConfig> criteriaSolvingConfig)
     {
         _logger = logger;
+        _criteriaSolvingConfig = criteriaSolvingConfig.Value;
     }
 
     public IActionResult Index()

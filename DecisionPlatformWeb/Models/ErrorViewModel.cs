@@ -1,4 +1,4 @@
-namespace decision_platform_web.Models;
+namespace DecisionPlatformWeb.Models;
 
 public class ErrorViewModel
 {
