@@ -49,7 +49,6 @@ function showInvalidMessageOnClickInput(inputSelector, feedbackSelector, message
 }
 
 // CRITERIA
-
 class Criteria {
     constructor(name, type) {
         this.name = name;
@@ -92,7 +91,7 @@ function createCriteria(criteriaName, type) {
             ".create-criteria-li .invalid-feedback", message);
         return;
     }
-
+    
     let criteria = new Criteria(criteriaName, type);
     // Добавить критерий в список
     $(".criteria-list").append(getCriteriaListItemHtml(criteria))
@@ -100,11 +99,11 @@ function createCriteria(criteriaName, type) {
 
     // Очистить input
     $(".create-criteria-li input").val("");
-    $(".create-criteria-li .form-select").val(1);
+    $(".create-criteria-li .form-select").val("max");
 
     // Добавить столбик в таблицу
     addCriteriaOnTable(criteria)
-
+    
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
@@ -133,7 +132,7 @@ function getCriteriaListItemHtml(criteria) {
     return "<li class=\"list-group-item d-flex justify-content-between criteria-li\">\n" +
         "<p>" + criteria.getName() + "</p>\n" +
         "<div class=\"horizontal-div\">\n" +
-        " <span>" + (criteria.getType() === "max" ? "max" : "min") + "</span>" +
+        " <span>" + criteria.getType() + "</span>" +
         " <button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить критерий\"/>" +
         "</div>\n" +
         "</li>";
