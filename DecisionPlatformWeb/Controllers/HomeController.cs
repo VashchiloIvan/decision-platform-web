@@ -1,54 +1,39 @@
 ﻿using System.Diagnostics;
-using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace DecisionPlatformWeb.Controllers;
 
+// HomeController - Контроллер, отвечающий за редиректы по страницам интерфейса
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly MultiCriteriaSolvingConfig _config;
-    private readonly SupportedMethods _supportedMethods;
 
-    public HomeController(ILogger<HomeController> logger, 
-        IOptions<MultiCriteriaSolvingConfig> config)
+    public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
-        _config = config.Value;
-
-        this._supportedMethods = new SupportedMethods();
-        this.InitSupportedMethods();
     }
 
     public IActionResult Index()
     {
-        _logger.LogDebug("Request: Index");
+        _logger.LogInformation("Redirect: Index");
         
         return View();
     }
-
-    [HttpGet("criteria-relation-info")]
-    public IActionResult GetCriteriaRelationInfo()
+    
+    public IActionResult Privacy()
     {
-        _logger.LogDebug("Request: GetCriteriaRelationInfo");
+        _logger.LogInformation("Redirect: Privacy");
         
-        var convertAll = _config.CriteriaRelations.ConvertAll(x => x.Name);
-        
-        _logger.LogDebug($"Response: {convertAll}");
-        
-        return Json(convertAll);
+        return View();
     }
-
-    [HttpGet("decision-method-info")]
-    public IActionResult GetDecisionMethodInfo()
+    
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
     {
-        _logger.LogDebug("Request: GetCriteriaRelationInfo");
+        _logger.LogError($"Redirect: Error: {HttpContext.TraceIdentifier}");
         
-        _logger.LogDebug($"Response: {_supportedMethods}");
-        
-        return Json(_supportedMethods);
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
     // [HttpPost("export-xml")]
@@ -113,11 +98,6 @@ public class HomeController : Controller
     //     // return PartialView("_FieldsDontFilled");
     // }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
     // [HttpPost("make-iteration")]
     // public IActionResult MakeIteration([FromBody] DecisionMakerInfo makerInfo)
     // {
@@ -145,13 +125,6 @@ public class HomeController : Controller
     //         _methodResultStorage.removeMultiStepResult(multiStepResult);
     //     return Json(multiStepResult.IsSolutionComplete);
     // }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-
     // private MathModel getMathModelFromUiObjects(InnerCriteria[] criteriaArray, Alternative[] alternatives,
     //     out Dictionary<string, int> dictionary)
     // {
@@ -305,59 +278,4 @@ public class HomeController : Controller
     //
     //     return resultMethod;
     // }
-
-    private void InitSupportedMethods()
-    {
-        foreach (var method in _config.OneStepMethods)
-        {
-            Dictionary<string, List<string>> optional = new Dictionary<string, List<string>>();
-
-            if (method.OptionalMethods != null)
-            {
-                foreach (var opt in method.OptionalMethods)
-                {
-                    var optCfg = _config.OptionalMethods.Find(x => x.Key == opt);
-
-                    if (optCfg != null)
-                    {
-                        var methodsList = optCfg.Methods.ConvertAll(x => x.Name);
-                        optional.Add(optCfg.Name, methodsList);
-
-                        continue;
-                    }
-
-                    _logger.LogError("Failed to initialize supported method list");
-                    throw new ApplicationException("Wrong config");
-                }
-            }
-
-            _supportedMethods.OneStepMethodInfo.Add(method.Name, optional);
-        }
-        
-        foreach (var method in _config.MultiStepMethods)
-        {
-            Dictionary<string, List<string>> optional = new Dictionary<string, List<string>>();
-
-            if (method.OptionalMethods != null)
-            {
-                foreach (var opt in method.OptionalMethods)
-                {
-                    var optCfg = _config.OptionalMethods.Find(x => x.Key == opt);
-
-                    if (optCfg != null)
-                    {
-                        var methodsList = optCfg.Methods.ConvertAll(x => x.Name);
-                        optional.Add(optCfg.Name, methodsList);
-
-                        continue;
-                    }
-
-                    _logger.LogError("Failed to initialize supported method list");
-                    throw new ApplicationException("Wrong config");
-                }
-            }
-
-            _supportedMethods.MultiStepMethodInfo.Add(method.Name, optional);
-        }
-    }
 }
