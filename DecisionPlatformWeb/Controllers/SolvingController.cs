@@ -1,3 +1,4 @@
+using DecisionPlatformWeb.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DecisionPlatformWeb.Controllers;
@@ -6,13 +7,13 @@ namespace DecisionPlatformWeb.Controllers;
 // принятия решений
 public class SolvingController : Controller
 {
-    // [HttpPost("solve-task")]
-    // public IActionResult SolveTask([FromBody] TaskCondition taskCondition)
-    // {
-    //     return Json("");
-    //     
-    //     // return PartialView("_FieldsDontFilled");
-    // }
+    [HttpPost("solve-task")]
+    public IActionResult SolveTask([FromBody] TaskCondition taskCondition)
+    {
+        return Json("");
+        
+        // return PartialView("_FieldsDontFilled");
+    }
 
     // [HttpPost("make-iteration")]
     // public IActionResult MakeIteration([FromBody] DecisionMakerInfo makerInfo)
