@@ -1,5 +1,9 @@
+using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity;
+using DecisionPlatformWeb.Service;
+using DecisionPlatformWeb.Service.Factory;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace DecisionPlatformWeb.Controllers;
 
@@ -7,9 +11,33 @@ namespace DecisionPlatformWeb.Controllers;
 // принятия решений
 public class SolvingController : Controller
 {
+    private readonly MathModelParser _mmParser;
+    private readonly OneStepMethodsParser _osmParser;
+
+    public SolvingController(IOptions<MultiCriteriaSolvingConfig> config)
+    {
+        var factory = new CriteriaRelationFactory(config.Value);
+        _mmParser = new MathModelParser(factory);
+
+        _osmParser = new OneStepMethodsParser(config);
+    }
+
     [HttpPost("solve-task")]
     public IActionResult SolveTask([FromBody] TaskCondition taskCondition)
     {
+        OneStepSolver solver = new OneStepSolver(_mmParser, _osmParser);
+        solver.Solve(taskCondition);
+        
+        // if multistep
+        //      parse methods
+        //      add on cache
+        //      send uuid cookie
+        //      send task process
+        
+        // if onestep
+        //      parse methods
+        //      send task process 
+        
         return Json("");
         
         // return PartialView("_FieldsDontFilled");
