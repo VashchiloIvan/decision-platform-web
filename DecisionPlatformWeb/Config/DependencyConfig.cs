@@ -1,4 +1,6 @@
-﻿namespace DecisionPlatformWeb.Config;
+﻿using DecisionPlatformWeb.Service.Cache;
+
+namespace DecisionPlatformWeb.Config;
 
 public static class DependencyConfig
 {
@@ -9,7 +11,9 @@ public static class DependencyConfig
         var services = builder.Services;
         var configuration = builder.Configuration;
 
-        services.Configure<MultiCriteriaSolvingConfig>(
-            configuration.GetSection(MultiCriteriaSolvingSection));
+        var cfgSection = configuration.GetRequiredSection(MultiCriteriaSolvingSection);
+        services.Configure<MultiCriteriaSolvingConfig>(cfgSection);
+
+        services.AddSingleton(new Cache(cfgSection.GetValue<double>("CacheTimeout")));
     }
 }

@@ -2,11 +2,11 @@ using DecisionPlatformWeb.Config.MultiCriteriaConfigComponents;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
 
-namespace DecisionPlatformWeb.Service;
+namespace DecisionPlatformWeb.Service.Parser;
 
 public class NormalizerParser
 {
-    private const string configKey = "Нормировщик";
+    private const string configKey = "Нормировщик мат. модели";
 
     private const string minMaxNormalizerName = "Минимаксный нормировщик";
     public NormalizerParser(List<OptionalMethodConfig> config)

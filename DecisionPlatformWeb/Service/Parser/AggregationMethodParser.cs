@@ -2,7 +2,7 @@ using DecisionPlatformWeb.Config.MultiCriteriaConfigComponents;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
 
-namespace DecisionPlatformWeb.Service;
+namespace DecisionPlatformWeb.Service.Parser;
 
 public class AggregationMethodParser
 {

@@ -1,10 +1,6 @@
 ﻿let methodsInfo = {}
 
 $(document).ready(function () {
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-
     // on create criteria
     $(".create-criteria-li .btn").on("click", (e) => {
         const criteriaName = $(".create-criteria-li input").val();
@@ -729,7 +725,6 @@ function getMethodInfo() {
 
 // SOLVE
 function onSolveBtnClick(e) {
-    console.log("solve start");
     $.ajax({
         url: "solve-task",
         type: "POST",

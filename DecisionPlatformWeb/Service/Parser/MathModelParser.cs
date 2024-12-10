@@ -1,15 +1,14 @@
 using DecisionPlatformWeb.Entity.Inner;
-using DecisionPlatformWeb.Service.Factory;
 
-namespace DecisionPlatformWeb.Service;
+namespace DecisionPlatformWeb.Service.Parser;
 
 public class MathModelParser
 {
-    private readonly CriteriaRelationFactory _factory;
+    private readonly CriteriaRelationParser _parser;
 
-    public MathModelParser(CriteriaRelationFactory factory)
+    public MathModelParser(CriteriaRelationParser parser)
     {
-        _factory = factory;
+        _parser = parser;
     }
 
     public MathModel Parse(Entity.Inner.Criteria[] conditionCriteriaList, Alternative[] conditionAlternativeList)
@@ -36,6 +35,6 @@ public class MathModelParser
 
     public CriteriaRelation Parse(MathModel model, Entity.Inner.CriteriaRelation relation)
     {
-        return _factory.ProduceCriteriaRelation(model, relation);
+        return _parser.ProduceCriteriaRelation(model, relation);
     }
 }

@@ -1,7 +1,9 @@
 using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity;
-using DecisionPlatformWeb.Service;
-using DecisionPlatformWeb.Service.Factory;
+using DecisionPlatformWeb.Models;
+using DecisionPlatformWeb.Service.Cache;
+using DecisionPlatformWeb.Service.Parser;
+using DecisionPlatformWeb.Service.Solver;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -13,52 +15,70 @@ public class SolvingController : Controller
 {
     private readonly MathModelParser _mmParser;
     private readonly OneStepMethodsParser _osmParser;
+    private readonly MultiStepMethodsParser _msmParser;
 
-    public SolvingController(IOptions<MultiCriteriaSolvingConfig> config)
+    private readonly Cache _cache;
+
+    private const string oneStepTaskType = "1";
+    private const string multiStepTaskType = "2";
+
+    public SolvingController(IOptions<MultiCriteriaSolvingConfig> config, Cache cache)
     {
-        var factory = new CriteriaRelationFactory(config.Value);
+        var factory = new CriteriaRelationParser(config.Value);
+        
         _mmParser = new MathModelParser(factory);
-
         _osmParser = new OneStepMethodsParser(config);
+        _msmParser = new MultiStepMethodsParser(config);
+
+        _cache = cache;
     }
 
     [HttpPost("solve-task")]
     public IActionResult SolveTask([FromBody] TaskCondition taskCondition)
     {
-        OneStepSolver solver = new OneStepSolver(_mmParser, _osmParser);
-        solver.Solve(taskCondition);
-        
-        // if multistep
-        //      parse methods
-        //      add on cache
-        //      send uuid cookie
-        //      send task process
-        
-        // if onestep
-        //      parse methods
-        //      send task process 
-        
-        return Json("");
-        
-        // return PartialView("_FieldsDontFilled");
+        if (taskCondition.MethodInfo.Type == oneStepTaskType)
+        {
+            OneStepSolver solver = new OneStepSolver(_mmParser, _osmParser);
+            var solveProcess = solver.Solve(taskCondition);
+
+            return PartialView("_OneStepSolveResult", solveProcess);
+        }
+
+        if (taskCondition.MethodInfo.Type == multiStepTaskType)
+        {
+            MultiStepSolver solver = new MultiStepSolver(_mmParser, _msmParser);
+            var solveProcess = solver.Solve(taskCondition);
+            
+            Guid guid = _cache.AddObject(solver);
+            solveProcess.Guid = guid;
+
+            return PartialView("_MultiStepSolveResult", solveProcess);
+        }
+
+        return PartialView("Error", new ErrorViewModel());
+    }
+    
+    [HttpPost("stop-solving")]
+    public IActionResult StopSolving([FromBody] StopSolvingModel model)
+    {
+        _cache.RemoveObject(model.id);
+        return Json("aboba");
     }
 
-    // [HttpPost("make-iteration")]
-    // public IActionResult MakeIteration([FromBody] DecisionMakerInfo makerInfo)
-    // {
-    //     MultiStepResult multiStepResult = _methodResultStorage.getMultiStepResult(makerInfo.Guid);
-    //     var decisionMakerInfo = DecisionMakerInfoFactory.CreateDecisionMakerInfo(makerInfo);
-    //     List<string> protocol = multiStepResult.MakeIteration(decisionMakerInfo);
-    //     return PartialView("_ProtocolResult", protocol);
-    // }
-        
-    // [HttpPost("stop-solving")]
-    // public IActionResult StopSolving([FromBody] DecisionMakerInfo makerInfo)
-    // {
-    //     MultiStepResult multiStepResult = _methodResultStorage.getMultiStepResult(makerInfo.Guid);
-    //     _methodResultStorage.removeMultiStepResult(multiStepResult);
-    //     return Json("aboba");
-    // }
+    [HttpPost("make-iteration")]
+    public IActionResult MakeIteration([FromBody] MakerInfo makerInfo)
+    {
+        var multiStepSolver = _cache.GetObject(makerInfo.Id);
+        if (multiStepSolver == null)
+        {
+            // cache expired
+            throw new Exception("cache expired");
+        }
+
+        MultiSolveProcess process = multiStepSolver.MakeIteration(makerInfo);
+        _cache.UpdateObject(makerInfo.Id, multiStepSolver);
+        return PartialView("_MultiProtocolResult", process);
+    }
 
     // [HttpGet("is-solving-stopped")]
     // public IActionResult IsSolvingStopped([FromQuery] Guid guid)

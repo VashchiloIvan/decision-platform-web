@@ -4,6 +4,7 @@ namespace DecisionPlatformWeb.Config;
 
 public class MultiCriteriaSolvingConfig
 {
+    public double CacheTimeout { get; set; }
     public List<Option> CriteriaRelations { get; set; }
     public List<OptionalMethodConfig> OptionalMethods { get; set; }
     public List<DecisionMethodConfig> OneStepMethods { get; set; }

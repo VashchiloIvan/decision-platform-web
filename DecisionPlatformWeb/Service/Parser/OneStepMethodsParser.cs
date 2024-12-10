@@ -3,11 +3,11 @@ using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
 using Microsoft.Extensions.Options;
 
-namespace DecisionPlatformWeb.Service;
+namespace DecisionPlatformWeb.Service.Parser;
 
 public class OneStepMethodsParser
 {
-    private const string lexicographicOptimization = "Лексикографическая оптимизация";
+    private const string lexicographicOptimization = "Метод лексикографической оптимизации";
     private const string criteriaAggregationMethod = "Метод свертки критериев";
     
     private readonly NormalizerParser _normalizerParser;
@@ -63,6 +63,7 @@ public class OneStepMethodsParser
         
         method.setMathModel(model);
         method.setCriteriaRelation(relation);
+        method.withSolveProcessLog();
 
         return method;
     }

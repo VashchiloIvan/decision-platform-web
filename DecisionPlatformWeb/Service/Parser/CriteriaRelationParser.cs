@@ -1,13 +1,13 @@
 using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity.Inner;
 
-namespace DecisionPlatformWeb.Service.Factory;
+namespace DecisionPlatformWeb.Service.Parser;
 
-public class CriteriaRelationFactory
+public class CriteriaRelationParser
 {
     private readonly MultiCriteriaSolvingConfig _config;
 
-    public CriteriaRelationFactory(MultiCriteriaSolvingConfig config)
+    public CriteriaRelationParser(MultiCriteriaSolvingConfig config)
     {
         _config = config;
     }

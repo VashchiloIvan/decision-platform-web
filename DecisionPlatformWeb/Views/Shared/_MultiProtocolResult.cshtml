@@ -1,0 +1,118 @@
+﻿@model DecisionPlatformWeb.Entity.MultiSolveProcess
+
+@if (Model != null)
+{
+    <div class="steps">
+        <div>
+            @await Html.PartialAsync("_ProtocolResult", Model.Process)
+        </div>
+    </div>
+    <div class="solve-buttons">  
+    @if (!Model.IsFinished && Model.IsValidModel)
+    {
+        <div class="controls">
+            @foreach (var additionalInfoControl in Model.Controls)
+            {
+                <div>
+                    <p>@additionalInfoControl.Name</p>
+                    <input type=@additionalInfoControl.InputType class="form-control" />
+                </div>
+            }
+            <div class="invalid-feedback">
+            </div>
+        </div>
+        <div class="multi-buttons mt-2">
+            <button class="btn btn-primary make-iteration" type="button">
+                Продолжить поиск решения
+            </button>
+            <button class="btn btn-secondary stop-solving" type="button">
+                Завершить поиск
+            </button>
+        </div>
+    }
+    </div>
+}
+<script type="text/javascript">
+$(function () {
+    function makeIteration (e) {
+        const controls = $('.controls div');
+        const attributesArray = [];
+
+        console.log(controls)
+
+        for (let i = 0; i < controls.length; i++) {
+            const control = controls[i];
+            
+            const input = control.querySelector('input');
+            if (!input) {
+                continue;
+            }
+            
+            const attributeValue = input.type === 'checkbox' ? input.checked : input.value;
+
+            if (attributeValue === "") {
+                showInvalidMessageOnClickInput(control,
+                    ".solve-buttons .controls .invalid-feedback", "Поле должно быть заполнено");
+                    
+                return
+            }
+            
+            attributesArray.push({ name: $(control).children('p').html(), value: attributeValue });
+        }
+        
+        let sendedData = {
+           "id": '@Model.Guid',
+           "parameters": attributesArray,
+        };
+        $.ajax({
+            url: "/make-iteration",
+            method: "POST",
+            data: JSON.stringify(sendedData),
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $(".steps").append(
+                "<div class=\"d-flex justify-content-center div-to-delete mb-5 mt-3\">" +
+                "  <div class=\"spinner-border\" role=\"status\">" +
+                "    <span class=\"visually-hidden\">Loading...</span>" +
+                "  </div>" +
+                "</div>")
+            },
+            complete: function () {
+                $(".div-to-delete").remove() // loading spinner
+            },
+            success: function(response) {
+                $(".solve-buttons").remove() // solve buttons from previous step
+                $(".steps").addClass("old-steps")
+                $(".steps").append(response)
+                $(".old-steps").removeClass("steps")
+            },
+            error: function() {
+                console.log("Error on make-iteration")
+            }
+        });
+    }
+    
+    function stopSolving (e) {            
+        let sendedData = {
+           "id": '@Model.Guid'
+        };
+        $.ajax({
+            url: "stop-solving",
+            method: "POST",
+            data: JSON.stringify(sendedData),
+            contentType: "application/json; charset=utf-8",
+            success: function(response) {
+                $(".multi-buttons").html("<p>Решение завершено досрочно</p>")
+                $(".controls").remove();
+            },
+            error: function() {
+                console.log("Error on stop solving")
+            }
+        });
+    }
+    
+    $(".make-iteration").on("click", makeIteration)
+    $(".stop-solving").on("click", stopSolving)
+})
+</script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

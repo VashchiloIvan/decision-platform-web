@@ -1,0 +1,16 @@
+﻿@model DecisionPlatformWeb.Entity.MultiSolveProcess
+
+<p class="text-sm-start fs-3 mt-4 mb-3 process-identifier" id=@Model.Guid>Решение задачи принятия решений</p>
+@if (Model != null)
+{
+    <div>
+        <h4 class="fw-bold">@Model.Method.Name</h4>
+        @foreach (var addMethod in Model.Method.AdditionalMethods)
+        {
+            <p>@addMethod.Name - @addMethod.Value</p>
+        }
+    </div>
+    <div>
+        @await Html.PartialAsync("_MultiProtocolResult", Model)
+    </div>
+}

@@ -1,0 +1,38 @@
+﻿@model DecisionPlatformWeb.Entity.SolveProcess
+
+<p class="text-sm-start fs-3 mt-4 mb-3">Решение задачи принятия решений</p>
+@if (Model != null)
+{
+    var counter = 0;
+    <ul class="list-group">
+    @foreach (var information in Model.Processes)
+    {
+        <li class="list-group-item border border-dark mb-1">
+            <h4 class="fw-bold">@information.Method.Name</h4>
+            @foreach (var addMethod in information.Method.AdditionalMethods)
+            {
+                <p>@addMethod.Name - @addMethod.Value</p>
+            }
+            @* Кнопки полное краткое *@
+            <div class="buttons mt-2">
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@(counter++)" aria-expanded="false">
+                    Результат поиска
+                </button>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@(counter++)" aria-expanded="false">
+                    Подробное решение
+                </button>
+            </div>
+            <div class="collapse" id="collapse-@(counter - 1)">
+                <div class="card card-body">
+                    @await Html.PartialAsync("_ProtocolResult", information.Process)
+                </div>
+            </div>
+            <div class="collapse" id="collapse-@(counter - 2)">
+                <div class="card card-body">
+                    <p><span class="fw-bold">Результат: </span>@information.Process[^1].AsString()</p>
+                </div>
+            </div>
+        </li>
+    }
+    </ul>
+}

@@ -1,4 +1,4 @@
-namespace DecisionPlatformWeb.Service;
+namespace DecisionPlatformWeb.Service.Parser;
 
 public class ConfigChecker
 {

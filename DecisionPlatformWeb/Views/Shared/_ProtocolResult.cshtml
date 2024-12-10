@@ -1,0 +1,93 @@
+﻿@model TaskProcess
+
+@{
+    string[] sidebar = {};
+    bool withSidebar = false;
+    int sidebarCounter = 0;
+}
+
+@for (int i = 0; i < @Model.Count; i++)
+{
+    var info = @Model[i];
+    
+    if (info.StepType() == "text")
+    {
+        <p class="mb-3">@info.AsString()</p>
+        continue;
+    }
+    
+    if (info.StepType() == "sidebar")
+    {
+        sidebar = info.AsString().Split("|");
+        sidebarCounter = 0;
+        withSidebar = true;
+        
+        continue;
+    }
+    
+    if (info.StepType() == "header")
+    {
+        <table class="table">
+            <thead>
+            @if (withSidebar)
+            {
+                <th scope="col">#</th>
+            }
+
+            @foreach (var colName in info.AsString().Split("|"))
+            {
+                <th scope="col">@colName</th>
+            }
+            </thead>
+            <tbody>
+            @for (var j = i + 1; j < Model.Count; j++, i++)
+            {
+                info = @Model[j];
+                
+                if (info.StepType() == "end_table")
+                {
+                    sidebar = new string[]{};
+                    withSidebar = false;
+                    sidebarCounter = 0;
+                    
+                    break;
+                }
+                
+                if (info.StepType() == "row")
+                {
+                    <tr>
+                        @if (withSidebar)
+                        {
+                            <th scope="col">@sidebar[sidebarCounter]</th>
+                            sidebarCounter++;
+                        }
+                        
+                        @foreach (var num in Model[j].AsString().Split("|"))
+                        {
+                            <td>@num</td>
+                        }
+                    </tr>
+                }
+                
+                if (info.StepType() == "srow")
+                {
+                    var row = @Model[j].AsString().Split("|");
+                    
+                    <tr>
+                        @if (withSidebar)
+                        {
+                            <th scope="col">@sidebar[sidebarCounter]</th>
+                            sidebarCounter++;
+                        }
+                        
+                        @for (int ii = 0; ii < row.Length; ii+=2)
+                        {
+                            <td style="background-color: @row[ii]">@row[ii + 1]</td>   
+                        }
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    }
+}
