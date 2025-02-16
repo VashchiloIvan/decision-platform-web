@@ -42,7 +42,7 @@ public class MultiStepSolver
             IsFinished = result.first.getStatus() == DecisionStatus.Optimal ||
                          result.first.getStatus() == DecisionStatus.Feasible ||
                          result.first.getStatus() == DecisionStatus.Infeasible,
-            IsValidModel = result.first.getStatus() != DecisionStatus.InvalidModel,
+            IsValidModel = result.first.getStatus() != DecisionStatus.InvalidTaskModel,
             Controls = _msmParser.GetControls(_method),
         };
     }

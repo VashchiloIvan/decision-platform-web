@@ -9,6 +9,7 @@ public class OneStepMethodsParser
 {
     private const string lexicographicOptimization = "Метод лексикографической оптимизации";
     private const string criteriaAggregationMethod = "Метод свертки критериев";
+    private const string smartMethod = "Smart";
     
     private readonly NormalizerParser _normalizerParser;
     private readonly AggregationMethodParser _aggregationMethodParser;
@@ -21,7 +22,7 @@ public class OneStepMethodsParser
 
         var supported = new[]
         {
-            lexicographicOptimization, criteriaAggregationMethod
+            lexicographicOptimization, criteriaAggregationMethod, smartMethod
         };
 
         var configMethods = cfg.OneStepMethods.Select(m => m.Method).ToArray();
@@ -57,6 +58,10 @@ public class OneStepMethodsParser
                 method = parseCriteriaAggregationMethod(methodInfo);
                 
                 break;
+            case smartMethod:
+                method = parseSmartMethod(methodInfo);
+                
+                break;
             default:
                 throw new InvalidDataException($"unsupported method: {methodInfo.Name}");
         }
@@ -79,6 +84,16 @@ public class OneStepMethodsParser
         var aggregationMethod = _aggregationMethodParser.Parse(methodInfo.AdditionalMethods);
         
         CriteriaAggregationMethod method = new CriteriaAggregationMethod(aggregationMethod, normalizer);
+
+        return method;
+    }
+    
+    private Smart parseSmartMethod(Method methodInfo)
+    {
+        var normalizer = _normalizerParser.Parse(methodInfo.AdditionalMethods);
+        
+        Smart method = new Smart();
+        method.setNormalizer(normalizer);
 
         return method;
     }
