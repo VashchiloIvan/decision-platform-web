@@ -13,12 +13,14 @@ public class OneStepMethodsParser
     
     private readonly NormalizerParser _normalizerParser;
     private readonly AggregationMethodParser _aggregationMethodParser;
+    private readonly MinMaxValuesParser _minMaxValuesParser;
 
     public OneStepMethodsParser(IOptions<MultiCriteriaSolvingConfig> config)
     {
         var cfg = config.Value;
         _normalizerParser = new NormalizerParser(cfg.OptionalMethods);
         _aggregationMethodParser = new AggregationMethodParser(cfg.OptionalMethods);
+        _minMaxValuesParser = new MinMaxValuesParser(cfg.OptionalMethods);
 
         var supported = new[]
         {
@@ -90,10 +92,11 @@ public class OneStepMethodsParser
     
     private Smart parseSmartMethod(Method methodInfo)
     {
-        var normalizer = _normalizerParser.Parse(methodInfo.AdditionalMethods);
+        var minMaxCriteriaValues = _minMaxValuesParser.Parse(methodInfo.AdditionalMethods);
         
         Smart method = new Smart();
-        method.setNormalizer(normalizer);
+        
+        method.setMinMaxCriteriaValues(minMaxCriteriaValues);
 
         return method;
     }

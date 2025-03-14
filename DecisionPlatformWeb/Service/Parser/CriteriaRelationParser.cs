@@ -12,9 +12,14 @@ public class CriteriaRelationParser
         _config = config;
     }
 
-    public CriteriaRelation ProduceCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation relation)
+    public CriteriaRelation ProduceCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation? relation)
     {
         var method = "";
+
+        if (relation == null)
+        {
+            return null;
+        }
 
         foreach (var cfg in _config.CriteriaRelations)
         {
@@ -44,7 +49,7 @@ public class CriteriaRelationParser
             return produceSimpleCriteriaRelation(model, relation);
         }
 
-        throw new ArgumentException("Информация о важности критериев не поддерживается!");
+        return null;
     }
 
 
