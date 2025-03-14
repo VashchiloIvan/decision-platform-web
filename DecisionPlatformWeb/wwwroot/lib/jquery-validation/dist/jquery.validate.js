@@ -640,7 +640,7 @@ $.extend( $.validator, {
 			.filter( function() {
 				var name = this.name || $( this ).attr( "name" ); // For contenteditable
 				if ( !name && validator.settings.debug && window.console ) {
-					console.error( "%o has no name assigned", this );
+					console.error( );
 				}
 
 				// Set form expando on contenteditable
@@ -1003,7 +1003,7 @@ $.extend( $.validator, {
 				if ( typeof this.settings.success === "string" ) {
 					error.addClass( this.settings.success );
 				} else {
-					this.settings.success( error, element );
+					this.settings.success( error );
 				}
 			}
 			this.toShow = this.toShow.add( error );

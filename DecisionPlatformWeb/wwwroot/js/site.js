@@ -571,22 +571,25 @@ function onStepMethodSelected(e) {
 
 function onAddOneStepMethodClick(e) {
     const li = getMethodLiToList();
+    
+    if (li == "") {
+        return
+    }
+    
     onAddOneStepMethodLi(li);
     $(".methods .method-select-div .onestep-select").val("non");
     $(".methods .method-select-div .onestep-select").change();
 }
 
 function onAddOneStepMethodLi(li) {
-    {
-        if (li !== false) {
-            $(".methods .method-select-div .list-group").append(li);
-            $(".methods .method-select-div .list-group .btn-danger").click((e) => {
-                $(e.target).parent().parent().remove()
-            })
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
-        }
+    if (li != "") {
+        $(".methods .method-select-div .list-group").append(li);
+        $(".methods .method-select-div .list-group .btn-danger").click((e) => {
+            $(e.target).parent().parent().remove()
+        })
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
     }
 }
 
@@ -630,16 +633,39 @@ function addAdditionalMethodOnSelectChanged(e, src) {
     let res = "";
     if (Object.keys(src).includes(val)) {
         const additional = src[val];
+        
         Object.keys(additional).forEach(parameter => {
             res += "<div>"
-            res += "<p>" + parameter + "</p>";
-            res +=
-                "<select class=\"form-select mb-3\">" +
-                "<option value='non' selected>Choose...</option>";
-            additional[parameter].forEach(val => {
-                res += "<option value='" + val + "'>" + val + "</option>"
-            })
-            res += "</select>"
+            res += "<p class=\""+additional[parameter].type+"\">" + parameter + "</p>";
+            
+            if (additional[parameter].type === "select") {
+                res +=
+                    "<select class=\"form-select mb-3\">" +
+                    "<option value='non' selected>Choose...</option>";
+                additional[parameter].selectList.forEach(val => {
+                    res += "<option value='" + val + "'>" + val + "</option>"
+                })
+                res += "</select>"
+            }
+
+            if (additional[parameter].type === "minmaxvalues") {
+                var criterias = getCriteriaList()
+
+                res += "<table><thead><tr>"
+                res += "<th scope=\"col\">Criteria</th>"
+                res += "<th scope=\"col\">Min value</th>"
+                res += "<th scope=\"col\">Max value</th>"
+                res += "</tr></thead><tbody>"
+                criterias.forEach(criteria => {
+                    res += "<tr>" 
+                    res += "<th scope=\"row\">"+criteria.getName()+"</th>"
+                    res += "<td><input type=\"number\" class=\"form-control\"></td>"
+                    res += "<td><input type=\"number\" class=\"form-control\"></td>"
+                    res += "</tr>"
+                })
+                res += "</tbody></table>"
+            }
+
             res += "</div>"
         })
     }
@@ -649,19 +675,47 @@ function addAdditionalMethodOnSelectChanged(e, src) {
 function getMethodLiToList() {
     const methodName = $(".methods .method-select-div .add-form .onestep-select").val();
     if (methodName === "non")
-        return false;
+        return "";
     let additional = [];
     let needToExit = false;
+    
     $(".methods .method-select-div .add-form .additional-info div").each(function () {
+        var p = $(this).children("p")
+
         const paramName = $(this).children("p").html()
-        const paramValue = $(this).children(".form-select").val();
-        if (paramValue === "non") {
-            needToExit = true;
+        let paramValue = "";
+
+        if (p.hasClass("select")) {
+            paramValue = $(this).children(".form-select").val();
+            if (paramValue === "non") {
+                needToExit = true;
+            }
         }
+        
+        if (p.hasClass("minmaxvalues")) {
+            let values = [];
+            
+            $(this).find("tbody tr").each(function() {
+                let criteriaName = $(this).find("th").text();
+                let minValue = $(this).find("td:eq(0) input").val();
+                let maxValue = $(this).find("td:eq(1) input").val();
+                
+                if (minValue === "" || maxValue === "") {
+                    needToExit = true
+                }
+                
+                values.push(`${criteriaName} [${minValue}, ${maxValue}]`);
+            });
+            
+            paramValue = values.join("; ");
+        }
+        
         additional.push({name: paramName, value: paramValue});
     })
+    
     if (needToExit)
         return "";
+    
     let res = "<li class=\"list-group-item d-flex justify-content-between method-on-li\">";
     res += "<div class='vals'>"
     res += "<p class='name fw-bold'>" + methodName + "</p>";
@@ -677,7 +731,7 @@ function getMethodLiToList() {
 function getMethodLiToListWithImport(method) {
     const methodName = method.name;
     if (methodName === "non")
-        return false;
+        return "";
     let additional = method.additionalMethods;
     let res = "<li class=\"list-group-item d-flex justify-content-between method-on-li\">";
     res += "<div class='vals'>"

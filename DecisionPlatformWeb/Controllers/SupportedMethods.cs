@@ -1,13 +1,14 @@
 namespace DecisionPlatformWeb.Controllers;
 
+public class SupportedMethodData
+{
+    public string Type { get; set; }
+    
+    public List<string> SelectList { get; set; } = new();
+}
+
 public class SupportedMethods
 {
-    public Dictionary<string, Dictionary<string, List<string>>> OneStepMethodInfo { get; set; }
-    public Dictionary<string, Dictionary<string, List<string>>> MultiStepMethodInfo { get; set; }
-
-    public SupportedMethods()
-    {
-        this.OneStepMethodInfo = new Dictionary<string, Dictionary<string, List<string>>>();
-        this.MultiStepMethodInfo = new Dictionary<string, Dictionary<string, List<string>>>();
-    }
+    public Dictionary<string, Dictionary<string, SupportedMethodData>> OneStepMethodInfo { get; set; } = new();
+    public Dictionary<string, Dictionary<string, SupportedMethodData>> MultiStepMethodInfo { get; set; } = new();
 }

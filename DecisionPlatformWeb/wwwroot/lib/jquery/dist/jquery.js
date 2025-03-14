@@ -1807,7 +1807,7 @@ Expr = Sizzle.selectors = {
 
 				// nth-* requires argument
 				if ( !match[ 3 ] ) {
-					Sizzle.error( match[ 0 ] );
+					Sizzle.error( );
 				}
 
 				// numeric x and y parameters for Expr.filter.CHILD
@@ -1819,7 +1819,7 @@ Expr = Sizzle.selectors = {
 
 				// other types prohibit arguments
 			} else if ( match[ 3 ] ) {
-				Sizzle.error( match[ 0 ] );
+				Sizzle.error( );
 			}
 
 			return match;
@@ -2055,7 +2055,7 @@ Expr = Sizzle.selectors = {
 			// Remember that setFilters inherits from pseudos
 			var args,
 				fn = Expr.pseudos[ pseudo ] || Expr.setFilters[ pseudo.toLowerCase() ] ||
-					Sizzle.error( "unsupported pseudo: " + pseudo );
+					Sizzle.error( );
 
 			// The user may use createPseudo to indicate that
 			// arguments are needed to create the filter function
@@ -2145,7 +2145,7 @@ Expr = Sizzle.selectors = {
 
 			// lang value must be a valid identifier
 			if ( !ridentifier.test( lang || "" ) ) {
-				Sizzle.error( "unsupported lang: " + lang );
+				Sizzle.error( );
 			}
 			lang = lang.replace( runescape, funescape ).toLowerCase();
 			return function( elem ) {
@@ -2378,7 +2378,7 @@ tokenize = Sizzle.tokenize = function( selector, parseOnly ) {
 	return parseOnly ?
 		soFar.length :
 		soFar ?
-			Sizzle.error( selector ) :
+			Sizzle.error( ) :
 
 			// Cache the tokens
 			tokenCache( selector, groups ).slice( 0 );
@@ -8873,13 +8873,7 @@ jQuery.parseXML = function( data ) {
 
 	parserErrorElem = xml && xml.getElementsByTagName( "parsererror" )[ 0 ];
 	if ( !xml || parserErrorElem ) {
-		jQuery.error( "Invalid XML: " + (
-			parserErrorElem ?
-				jQuery.map( parserErrorElem.childNodes, function( el ) {
-					return el.textContent;
-				} ).join( "\n" ) :
-				data
-		) );
+		jQuery.error( );
 	}
 	return xml;
 };
@@ -10239,7 +10233,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 		// Use data converter to retrieve json after script execution
 		s.converters[ "script json" ] = function() {
 			if ( !responseContainer ) {
-				jQuery.error( callbackName + " was not called" );
+				jQuery.error( );
 			}
 			return responseContainer[ 0 ];
 		};
