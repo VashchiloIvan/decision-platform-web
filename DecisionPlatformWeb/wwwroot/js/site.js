@@ -83,11 +83,10 @@ function createCriteria(criteriaName, type) {
         message = "Введите уникальное название";
     }
     if (message !== "") {
-        showInvalidMessageOnClickInput(".create-criteria-li input",
-            ".create-criteria-li .invalid-feedback", message);
+        showInvalidMessageOnClickInput(".create-criteria-li input", ".create-criteria-li .invalid-feedback", message);
         return;
     }
-    
+
     let criteria = new Criteria(criteriaName, type);
     // Добавить критерий в список
     $(".criteria-list").append(getCriteriaListItemHtml(criteria))
@@ -99,7 +98,7 @@ function createCriteria(criteriaName, type) {
 
     // Добавить столбик в таблицу
     addCriteriaOnTable(criteria)
-    
+
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
@@ -125,13 +124,7 @@ function addCriteriaOnTable(criteria) {
 }
 
 function getCriteriaListItemHtml(criteria) {
-    return "<li class=\"list-group-item d-flex justify-content-between criteria-li\">\n" +
-        "<p>" + criteria.getName() + "</p>\n" +
-        "<div class=\"horizontal-div\">\n" +
-        " <span>" + criteria.getType() + "</span>" +
-        " <button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить критерий\"/>" +
-        "</div>\n" +
-        "</li>";
+    return "<li class=\"list-group-item d-flex justify-content-between criteria-li\">\n" + "<p>" + criteria.getName() + "</p>\n" + "<div class=\"horizontal-div\">\n" + " <span>" + criteria.getType() + "</span>" + " <button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить критерий\"/>" + "</div>\n" + "</li>";
 }
 
 // ALTERNATIVE
@@ -161,10 +154,7 @@ function getAlternativeList() {
         $(this).children("td").each(function () {
             const mark = $(this).children("input").val();
             if (mark === undefined) {
-            } else if (mark === "")
-                isValid = false;
-            else
-                marks.push(parseFloat(mark.replace(",", ".")));
+            } else if (mark === "") isValid = false; else marks.push(parseFloat(mark.replace(",", ".")));
         })
         alternatives.push(new Alternative(name, marks));
     });
@@ -203,8 +193,7 @@ function deleteAlternative(e) {
 // === html helpers
 function getAlternativeTableItemHtml(alternativeNum, criteriaCount) {
     let res = "<tr><th scope='row'>" + alternativeNum + "</th>";
-    for (let i = 0; i < criteriaCount; i++)
-        res += "<td><input type='number' class='form-control'></td>";
+    for (let i = 0; i < criteriaCount; i++) res += "<td><input type='number' class='form-control'></td>";
     res += "<td><button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash float-end\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить альтернативу\"/></td>"
     return res + "</tr>"
 }
@@ -237,12 +226,9 @@ class CriteriaRelation {
 
 function getCriteriaRelationsFromBack(onSuccess) {
     $.ajax({
-        url: "/criteria-relation-info",
-        method: "get",
-        success: function (data, textStatus, jqXHR) {
+        url: "/criteria-relation-info", method: "get", success: function (data, textStatus, jqXHR) {
             onSuccess(data);
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
+        }, error: function (jqXHR, textStatus, errorThrown) {
             alert("Error");
         }
     })
@@ -317,8 +303,7 @@ function fillCriteriaRelationTypeFormFromImportedData(name, infoList) {
     let innerHtml = '';
     if (typeId === "4") {
         innerHtml = getSimpleCriteriaRelationFormHtml();
-    } else if (
-        typeId === "1" || typeId === "2" || typeId === "3") {
+    } else if (typeId === "1" || typeId === "2" || typeId === "3") {
         innerHtml = getWeightCriteriaRelationFormHtmlWithInfoList(infoList);
     } else {
         innerHtml = "";
@@ -328,10 +313,9 @@ function fillCriteriaRelationTypeFormFromImportedData(name, infoList) {
     // on add code
     $(".criteria-relation .criteria-relation-form .btn-primary").click(addRelationOnUlList);
 
-    if (name === "Порядковая информация")
-        infoList.forEach(info => {
-            addRelationOnUlListWithInfo(info);
-        })
+    if (name === "Порядковая информация") infoList.forEach(info => {
+        addRelationOnUlListWithInfo(info);
+    })
 
     // set toggle 
     $(function () {
@@ -344,11 +328,7 @@ function getWeightCriteriaRelationFormHtml() {
     let res = "<ul class=\"list-group\">";
 
     criteriaList.forEach(criteria => {
-        res +=
-            "<li class=\"list-group-item d-flex justify-content-between\">" +
-            "<span class=\"input-group-text\">" + criteria.getName() + "</span>" +
-            "<input type=\"number\" aria-label=\"criteria value\" class=\"form-control\">" +
-            "</li>"
+        res += "<li class=\"list-group-item d-flex justify-content-between\">" + "<span class=\"input-group-text\">" + criteria.getName() + "</span>" + "<input type=\"number\" aria-label=\"criteria value\" class=\"form-control\">" + "</li>"
     })
     return res + "</ul>";
 }
@@ -356,44 +336,25 @@ function getWeightCriteriaRelationFormHtml() {
 function getWeightCriteriaRelationFormHtmlWithInfoList(infoList) {
     let res = "<ul class=\"list-group\">";
     infoList.forEach(c => {
-        res +=
-            "<li class=\"list-group-item d-flex justify-content-between\">" +
-            "<span class=\"input-group-text\">" + c.criteriaName + "</span>" +
-            "<input type=\"number\" aria-label=\"criteria value\" class=\"form-control\" value='" + c.value + "'>" +
-            "</li>"
+        res += "<li class=\"list-group-item d-flex justify-content-between\">" + "<span class=\"input-group-text\">" + c.criteriaName + "</span>" + "<input type=\"number\" aria-label=\"criteria value\" class=\"form-control\" value='" + c.value + "'>" + "</li>"
     })
     return res + "</ul>";
 }
 
 function getSimpleCriteriaRelationFormHtml() {
-    let result =
-        "<ul class=\"list-group\">" +
-        "<li class=\"list-group-item d-flex justify-content-between\">" +
-        "<select class=\"form-select first-criteria\">";
+    let result = "<ul class=\"list-group\">" + "<li class=\"list-group-item d-flex justify-content-between\">" + "<select class=\"form-select first-criteria\">";
 
     let selectInner = "";
     const criteriaList = getCriteriaList();
     criteriaList.forEach((criteria) => {
-        selectInner += "<option value=\""
-            + criteria.getName() + "\">"
-            + criteria.getName() + "</option>"
+        selectInner += "<option value=\"" + criteria.getName() + "\">" + criteria.getName() + "</option>"
     });
 
     result += selectInner + "</select>";
-    result +=
-        "<select class=\"form-select relation\">" +
-        "<option selected value=\"0\">></option>" +
-        "<option value=\"1\">>=</option>" +
-        "<option value=\"2\">~</option>" +
-        "<option value=\"3\">&lt;=</option>" +
-        "<option value=\"4\">&lt;</option>" +
-        "</select>";
+    result += "<select class=\"form-select relation\">" + "<option selected value=\"0\">></option>" + "<option value=\"1\">>=</option>" + "<option value=\"2\">~</option>" + "<option value=\"3\">&lt;=</option>" + "<option value=\"4\">&lt;</option>" + "</select>";
     result += "<select class=\"form-select second-criteria\">";
     result += selectInner + "</select>";
-    result +=
-        "<button type=\"button\" class=\"btn btn-primary btn-sm bi bi-plus-lg\" data-toggle=\"tooltip\"" +
-        "data-placement=\"top\" title=\"Добавить отношение\"></button>" +
-        "</li></ul>";
+    result += "<button type=\"button\" class=\"btn btn-primary btn-sm bi bi-plus-lg\" data-toggle=\"tooltip\"" + "data-placement=\"top\" title=\"Добавить отношение\"></button>" + "</li></ul>";
     return result;
 }
 
@@ -404,13 +365,7 @@ function addRelationOnUlList() {
     const relationVal = $(".criteria-relation .criteria-relation-form .relation option:selected").text();
     const secondCriteriaName = $(".criteria-relation .criteria-relation-form .second-criteria option:selected").text();
 
-    item += "<span>" +
-        "<span class='fc'>" + firstCriteriaName + "</span> " +
-        "<span class='con'>" + relationVal + "</span> " +
-        "<span class='sc'>" + secondCriteriaName + "</span>" +
-        "</span>" +
-        "<button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash\"" +
-        "data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить отношение\"/>";
+    item += "<span>" + "<span class='fc'>" + firstCriteriaName + "</span> " + "<span class='con'>" + relationVal + "</span> " + "<span class='sc'>" + secondCriteriaName + "</span>" + "</span>" + "<button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash\"" + "data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить отношение\"/>";
 
     $(".criteria-relation .criteria-relation-form .list-group").append(item + "</li>");
 
@@ -429,13 +384,7 @@ function addRelationOnUlListWithInfo(info) {
     const relationVal = info.constraint;
     const secondCriteriaName = info.second;
 
-    item += "<span>" +
-        "<span class='fc'>" + firstCriteriaName + "</span> " +
-        "<span class='con'>" + relationVal + "</span> " +
-        "<span class='sc'>" + secondCriteriaName + "</span>" +
-        "</span>" +
-        "<button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash\"" +
-        "data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить отношение\"/>";
+    item += "<span>" + "<span class='fc'>" + firstCriteriaName + "</span> " + "<span class='con'>" + relationVal + "</span> " + "<span class='sc'>" + secondCriteriaName + "</span>" + "</span>" + "<button type=\"button\" class=\"btn btn-danger btn-sm bi bi-trash\"" + "data-toggle=\"tooltip\" data-placement=\"top\" title=\"Удалить отношение\"/>";
 
     $(".criteria-relation .criteria-relation-form .list-group").append(item + "</li>");
 
@@ -470,13 +419,9 @@ function getCriteriaRelationValuesFromUi() {
             const criteriaName = $(this).children(".input-group-text").html();
             const value = $(this).children(".form-control").val();
 
-            if (value === "")
-                isValid = false;
-            else
-                relArr.push({
-                    criteriaName: criteriaName,
-                    value: parseFloat(value.replace(",", "."))
-                });
+            if (value === "") isValid = false; else relArr.push({
+                criteriaName: criteriaName, value: parseFloat(value.replace(",", "."))
+            });
         })
     } else {
         isValid = false;
@@ -534,13 +479,9 @@ class AdditionalMethod {
 
 function getMethodInfoFromBack() {
     $.ajax({
-        url: "/decision-method-info",
-        method: "get",
-        async: false,
-        success: function (data, textStatus, jqXHR) {
+        url: "/decision-method-info", method: "get", async: false, success: function (data, textStatus, jqXHR) {
             methodsInfo = data;
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
+        }, error: function (jqXHR, textStatus, errorThrown) {
             alert("Error");
         }
     })
@@ -556,7 +497,10 @@ function onStepMethodSelected(e) {
         methodDiv.html(getOneStepMethodInputForm());
         $(".methods .method-select-div .onestep-select").change(e => {
             const additionalMethods = addAdditionalMethodOnSelectChanged(e, methodsInfo.oneStepMethodInfo);
+
             $(".methods .method-select-div .additional-info").html(additionalMethods);
+
+            $(".criteria-func-type").change(e => onCriteriaFunctionTypeChanged(e));
         })
         $(".methods .method-select-div .btn-primary").click(onAddOneStepMethodClick)
 
@@ -571,11 +515,11 @@ function onStepMethodSelected(e) {
 
 function onAddOneStepMethodClick(e) {
     const li = getMethodLiToList();
-    
+
     if (li == "") {
         return
     }
-    
+
     onAddOneStepMethodLi(li);
     $(".methods .method-select-div .onestep-select").val("non");
     $(".methods .method-select-div .onestep-select").change();
@@ -597,10 +541,7 @@ function getOneStepMethodInputForm() {
     let result = "";
     result += "<ul class=\"list-group\">";
     result += "<li class=\"list-group-item add-form\">";
-    result +=
-        "<p>Метод принятия решений</p><div class='d-flex'>" +
-        "<select class=\"form-select onestep-select\">" +
-        "<option value='non' selected>Choose...</option>";
+    result += "<p>Метод принятия решений</p><div class='d-flex'>" + "<select class=\"form-select onestep-select\">" + "<option value='non' selected>Choose...</option>";
     const keys = Object.keys(methodsInfo.oneStepMethodInfo);
     keys.forEach(methodName => {
         result += "<option value='" + methodName + "'>" + methodName + "</option>";
@@ -617,9 +558,7 @@ function getOneStepMethodInputForm() {
 function getMultiStepMethodInputForm() {
     let result = "";
     result += "<p>Метод принятия решения</p>";
-    result +=
-        "<select class=\"form-select multistep-select mb-3\">" +
-        "<option selected>Choose...</option>"
+    result += "<select class=\"form-select multistep-select mb-3\">" + "<option selected>Choose...</option>"
     const keys = Object.keys(methodsInfo.multiStepMethodInfo);
     keys.forEach(methodName => {
         result += "<option value='" + methodName + "'>" + methodName + "</option>"
@@ -633,22 +572,20 @@ function addAdditionalMethodOnSelectChanged(e, src) {
     let res = "";
     if (Object.keys(src).includes(val)) {
         const additional = src[val];
-        
+
         Object.keys(additional).forEach(parameter => {
             res += "<div>"
-            res += "<p class=\""+additional[parameter].type+"\">" + parameter + "</p>";
-            
+            res += "<p class=\"" + additional[parameter].type + "\">" + parameter + "</p>";
+
             if (additional[parameter].type === "select") {
-                res +=
-                    "<select class=\"form-select mb-3\">" +
-                    "<option value='non' selected>Choose...</option>";
+                res += "<select class=\"form-select mb-3\">" + "<option value='non' selected>Choose...</option>";
                 additional[parameter].selectList.forEach(val => {
-                    res += "<option value='" + val + "'>" + val + "</option>"
+                    res += "<option value='" + val.method + "'>" + val.name + "</option>"
                 })
                 res += "</select>"
             }
 
-            if (additional[parameter].type === "minmaxvalues") {
+            if (additional[parameter].type === "minmaxValues") {
                 var criterias = getCriteriaList()
 
                 res += "<table><thead><tr>"
@@ -657,10 +594,58 @@ function addAdditionalMethodOnSelectChanged(e, src) {
                 res += "<th scope=\"col\">Max value</th>"
                 res += "</tr></thead><tbody>"
                 criterias.forEach(criteria => {
-                    res += "<tr>" 
-                    res += "<th scope=\"row\">"+criteria.getName()+"</th>"
+                    res += "<tr>"
+                    res += "<th scope=\"row\">" + criteria.getName() + "</th>"
                     res += "<td><input type=\"number\" class=\"form-control\"></td>"
                     res += "<td><input type=\"number\" class=\"form-control\"></td>"
+                    res += "</tr>"
+                })
+                res += "</tbody></table>"
+            }
+
+            if (additional[parameter].type === "checkboxList") {
+                res += "<div class=\"form-check\">"
+                additional[parameter].selectList.forEach(val => {
+                    res += "<label>" + "<input class='form-check-input' type=\"checkbox\" name=\"" + parameter + "\" " + "value=\"" + val.method + "\" checked>" + val.name + "</label><br>"
+                })
+                res += "</div>"
+            }
+
+            if (additional[parameter].type === "criteriaFuncTypes") {
+                var criterias = getCriteriaList()
+
+                selectHtml = "<select class=\"form-select criteria-func-type\">"
+                isFirst = true
+                additional[parameter].selectList.forEach(val => {
+                    let params = ""
+                    if (val.parameters != null) {
+                        params = val.parameters.join(" ")
+                    }
+
+                    if (isFirst) {
+                        selectHtml += "<option selected value=\"" + params + "\">" + val.name + "</option>"
+                        isFirst = false
+
+                        return
+                    }
+
+                    selectHtml += "<option value=\"" + params + "\">" + val.name + "</option>"
+                })
+                selectHtml += "</select>"
+
+                res += "<table><thead><tr>"
+                res += "<th scope=\"col\">Критерий</th>"
+                res += "<th scope=\"col\">Тип функции</th>"
+                res += "<th scope=\"col\"></th><th scope=\"col\"></th>"
+                res += "</tr></thead><tbody>"
+                criterias.forEach(criteria => {
+                    res += "<tr>"
+                    res += "<th scope=\"row\">" + criteria.getName() + "</th>"
+                    res += "<td>"
+                    res += selectHtml
+                    res += "</td>"
+                    res += "<td></td>"
+                    res += "<td></td>"
                     res += "</tr>"
                 })
                 res += "</tbody></table>"
@@ -674,12 +659,11 @@ function addAdditionalMethodOnSelectChanged(e, src) {
 
 function getMethodLiToList() {
     const methodName = $(".methods .method-select-div .add-form .onestep-select").val();
-    if (methodName === "non")
-        return "";
+    if (methodName === "non") return "";
     let additional = [];
     let needToExit = false;
-    
-    $(".methods .method-select-div .add-form .additional-info div").each(function () {
+
+    $(".methods .method-select-div .add-form .additional-info > div").each(function () {
         var p = $(this).children("p")
 
         const paramName = $(this).children("p").html()
@@ -691,31 +675,68 @@ function getMethodLiToList() {
                 needToExit = true;
             }
         }
-        
-        if (p.hasClass("minmaxvalues")) {
+
+        if (p.hasClass("minmaxValues")) {
             let values = [];
-            
-            $(this).find("tbody tr").each(function() {
+
+            $(this).find("tbody tr").each(function () {
                 let criteriaName = $(this).find("th").text();
                 let minValue = $(this).find("td:eq(0) input").val();
                 let maxValue = $(this).find("td:eq(1) input").val();
-                
+
                 if (minValue === "" || maxValue === "") {
                     needToExit = true
                 }
-                
+
                 values.push(`${criteriaName} [${minValue}, ${maxValue}]`);
             });
-            
+
             paramValue = values.join("; ");
         }
-        
+
+        if (p.hasClass("checkboxList")) {
+            let selected = []
+
+            $(this).find(".form-check-input").each(function (idx, input) {
+                if (input.checked) {
+                    selected.push(input.value)
+                }
+            });
+
+            paramValue = selected.join(", ")
+        }
+
+        if (p.hasClass("criteriaFuncTypes")) {
+            let values = []
+            
+            $(this).find("table tbody tr").each(function () {
+                let criteriaName = $(this).find("th").html();
+                let selectedType = $(this).find("td > select > option:selected").text();
+
+                let vals = [];
+
+                const inp1 = $(this).find("td:eq(1) > input");
+                const inp2 = $(this).find("td:eq(2) > input");
+
+                if (inp1.length && inp1.val().trim() !== "") {
+                    vals.push(inp1.attr('placeholder') + "-" + inp1.val());
+                }
+
+                if (inp2.length && inp2.val().trim() !== "") {
+                    vals.push(inp2.attr('placeholder') + "-" + inp2.val());
+                }
+
+                values.push(criteriaName + " - " + selectedType + "[" + vals.join(", ") + "]");
+            })
+
+            paramValue = values.join(", ")
+        }
+
         additional.push({name: paramName, value: paramValue});
     })
-    
-    if (needToExit)
-        return "";
-    
+
+    if (needToExit) return "";
+
     let res = "<li class=\"list-group-item d-flex justify-content-between method-on-li\">";
     res += "<div class='vals'>"
     res += "<p class='name fw-bold'>" + methodName + "</p>";
@@ -730,8 +751,7 @@ function getMethodLiToList() {
 
 function getMethodLiToListWithImport(method) {
     const methodName = method.name;
-    if (methodName === "non")
-        return "";
+    if (methodName === "non") return "";
     let additional = method.additionalMethods;
     let res = "<li class=\"list-group-item d-flex justify-content-between method-on-li\">";
     res += "<div class='vals'>"
@@ -772,8 +792,7 @@ function getMethodInfo() {
             additionalMethods.push(new AdditionalMethod(key, value));
         });
         methods.push(new Method(methodName, additionalMethods));
-    } else
-        return null;
+    } else return null;
     return new MethodInfo(methodType, methods);
 }
 
@@ -785,11 +804,7 @@ function onSolveBtnClick(e) {
         data: JSON.stringify(buildSolveModel()),
         contentType: 'application/json; charset=utf-8',
         beforeSend: function () {
-            $(".solving").html("<div class=\"d-flex justify-content-center\">" +
-                "  <div class=\"spinner-border\" role=\"status\">" +
-                "    <span class=\"visually-hidden\">Loading...</span>" +
-                "  </div>" +
-                "</div>")
+            $(".solving").html("<div class=\"d-flex justify-content-center\">" + "  <div class=\"spinner-border\" role=\"status\">" + "    <span class=\"visually-hidden\">Loading...</span>" + "  </div>" + "</div>")
         },
         success: function (response) {
             $(".solving").html(response);
@@ -861,9 +876,9 @@ function onImportFileSelected(e) {
 
             // Criteria Relations 
             $(".criteria-relation-form .bi-trash").click();
-            if (response.criteriaRelation !== null)
+            if (response.criteriaRelation !== null) {
                 fillCriteriaRelationTypeFormFromImportedData(response.criteriaRelation.name, response.criteriaRelation.info)
-            else {
+            } else {
                 const item = $(".criteria-relation .form-select");
                 item.val("-100");
                 item.change();
@@ -873,7 +888,7 @@ function onImportFileSelected(e) {
             if (response.methodInfo !== null) {
                 $(".methods .select-step-method").val(response.methodInfo.type);
                 $(".methods .select-step-method").change();
-                
+
                 if (response.methodInfo.type === "1") {
                     response.methodInfo.methods.forEach(m => {
                         onAddOneStepMethodLi(getMethodLiToListWithImport(m));
@@ -926,4 +941,44 @@ function onExportFileSelected(url, filename) {
             // alert("QweQWEQWe")
         }
     })
+}
+
+function onCriteriaFunctionTypeChanged(e) {
+    let value = $(e.target).val().split(" ");
+    let tr = $(e.target).parent().parent();
+    
+    let firstInput = ""
+    let secondInput = ""
+
+    for (let i = 0; i < value.length; i++) {
+        let item = ""
+        
+        switch (value[i]){
+            case "r":
+                // item = "<label class=\"form-label\"></label>" 
+                item = "<input type=\"number\" class=\"form-control\" placeholder='Порог строгого предпочтения'>"
+                break
+            case "q":
+                // item = "<label class=\"form-label\"></label>"
+                item = "<input type=\"number\" class=\"form-control\" placeholder='Порог безразличия'>"
+                break
+            case "sigma":
+                // item = "<label class=\"form-label\"></label>"
+                item = "<input type=\"number\" class=\"form-control\" placeholder='Величина между порогом строгого предпочтения и базразличия'>"
+                break
+            default:
+                alert("unexpected data")
+        }
+        
+        if (i === 0) {
+            firstInput = item;
+        }
+
+        if (i === 1) {
+            secondInput = item;
+        }
+    }
+
+    $(tr).find("td:nth-child(3n)").html(firstInput)
+    $(tr).find("td:nth-child(4n)").html(secondInput)
 }

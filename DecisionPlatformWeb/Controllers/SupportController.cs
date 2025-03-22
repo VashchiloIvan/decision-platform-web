@@ -83,7 +83,7 @@ public class SupportController : Controller
                     
                     if (optCfg.Methods != null)
                     {
-                        data.SelectList = optCfg.Methods.ConvertAll(x => x.Name);
+                        data.SelectList = optCfg.Methods;
                     }
 
                     optional.Add(optCfg.Name, data);

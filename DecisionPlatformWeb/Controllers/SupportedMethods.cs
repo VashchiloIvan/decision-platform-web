@@ -1,10 +1,12 @@
+using DecisionPlatformWeb.Config.MultiCriteriaConfigComponents;
+
 namespace DecisionPlatformWeb.Controllers;
 
 public class SupportedMethodData
 {
     public string Type { get; set; }
     
-    public List<string> SelectList { get; set; } = new();
+    public List<Option> SelectList { get; set; } = new();
 }
 
 public class SupportedMethods
