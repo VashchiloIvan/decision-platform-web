@@ -1,0 +1,37 @@
+@model DecisionPlatformWeb.Entity.NaturalUncertainty.Protocols
+
+<p class="text-sm-start fs-3 mt-4 mb-3">Решение задачи принятия решений</p>
+@if (Model != null)
+{
+    var counter = 0;
+    <ul class="list-group">
+        @foreach (var information in Model.SolvingProtocols)
+        {
+            <li class="list-group-item border border-dark mb-1">
+                <h4 class="fw-bold">@information.Criteria.CriteriaName</h4>
+                @foreach (var addMethod in information.Criteria.Parameters)
+                {
+                    <p>@addMethod.Key - @addMethod.Value</p>
+                }
+                <div class="buttons mt-2">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@(counter++)" aria-expanded="false">
+                        Результат поиска
+                    </button>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@(counter++)" aria-expanded="false">
+                        Подробное решение
+                    </button>
+                </div>
+                <div class="collapse" id="collapse-@(counter - 1)">
+                    <div class="card card-body">
+                        @await Html.PartialAsync("_NUProtocolResult", information.SolvingProtocol)
+                    </div>
+                </div>
+                <div class="collapse" id="collapse-@(counter - 2)">
+                    <div class="card card-body">
+                        <p><span class="fw-bold">Результат: </span>@information.SolvingProtocol[^1].AsString()</p>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}

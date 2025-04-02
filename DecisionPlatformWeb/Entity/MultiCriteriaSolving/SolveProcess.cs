@@ -5,7 +5,7 @@ namespace DecisionPlatformWeb.Entity;
 public class MethodProcess
 {
     public Method Method { get; set; }
-    public TaskProcess Process { get; set; }
+    public DecisionWrapperCsharp.TaskProcess Process { get; set; }
     public string Result { get; set; }
 }
 

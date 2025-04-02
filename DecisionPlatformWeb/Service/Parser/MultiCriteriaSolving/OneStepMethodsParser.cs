@@ -1,9 +1,10 @@
 using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
+using DecisionWrapperCsharp;
 using Microsoft.Extensions.Options;
 
-namespace DecisionPlatformWeb.Service.Parser;
+namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 
 public class OneStepMethodsParser
 {
@@ -40,7 +41,7 @@ public class OneStepMethodsParser
         }
     }
 
-    public OneStepMethods Parse(MathModel model, CriteriaRelation relation, MethodInfo methodInfo)
+    public OneStepMethods Parse(MathModel model, DecisionWrapperCsharp.CriteriaRelation relation, MethodInfo methodInfo)
     {
         OneStepMethods methods = new OneStepMethods();
 
@@ -52,7 +53,7 @@ public class OneStepMethodsParser
         return methods;
     }
 
-    private OneStepMethod parse(MathModel model, CriteriaRelation relation, Method methodInfo)
+    private OneStepMethod parse(MathModel model, DecisionWrapperCsharp.CriteriaRelation relation, Method methodInfo)
     {
         OneStepMethod method;
 

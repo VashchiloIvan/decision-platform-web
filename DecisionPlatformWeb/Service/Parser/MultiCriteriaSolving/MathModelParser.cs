@@ -1,6 +1,6 @@
-using DecisionPlatformWeb.Entity.Inner;
+using DecisionWrapperCsharp;
 
-namespace DecisionPlatformWeb.Service.Parser;
+namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 
 public class MathModelParser
 {
@@ -11,13 +11,11 @@ public class MathModelParser
         _parser = parser;
     }
 
-    public MathModel Parse(Entity.Inner.Criteria[] conditionCriteriaList, Alternative[] conditionAlternativeList)
+    public MathModel Parse(Entity.Inner.Criteria[] conditionCriteriaList,
+        DecisionPlatformWeb.Entity.MultiCriteriaSolving.Inner.Alternative[] conditionAlternativeList)
     {
-        var cType = (string type) =>
-        {
-            return type == "max" ? CriteriaType.MAXIMIZATION : CriteriaType.MINIMIZATION;
-        };
-        
+        var cType = (string type) => { return type == "max" ? CriteriaType.MAXIMIZATION : CriteriaType.MINIMIZATION; };
+
         Criterias criteriaList = new Criterias();
         foreach (var criteria in conditionCriteriaList)
         {

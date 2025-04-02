@@ -1,4 +1,5 @@
 using DecisionPlatformWeb.Entity.Inner;
+using DecisionWrapperCsharp;
 
 namespace DecisionPlatformWeb.Entity;
 

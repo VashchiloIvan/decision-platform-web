@@ -1,6 +1,9 @@
 using DecisionPlatformWeb.Entity;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Service.Parser;
+using DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
+using DecisionWrapperCsharp;
+using CriteriaRelation = DecisionPlatformWeb.Entity.Inner.CriteriaRelation;
 
 namespace DecisionPlatformWeb.Service.Solver;
 
@@ -11,7 +14,7 @@ public class MultiStepSolver
 
     private MultiStepMultiCriteriaMethodSolver _solver;
     private MathModel _mathModel;
-    private CriteriaRelation _relation;
+    private DecisionWrapperCsharp.CriteriaRelation _relation;
     private Method _method;
 
     public MultiStepSolver(MathModelParser mmParser, MultiStepMethodsParser msmParser)

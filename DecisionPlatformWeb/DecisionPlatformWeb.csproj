@@ -18,6 +18,12 @@
       <Reference Include="decision-wrapper-csharp">
         <HintPath>..\..\decision-wrapper-csharp\decision-wrapper-csharp\bin\Debug\net7.0\decision-wrapper-csharp.dll</HintPath>
       </Reference>
+      <Reference Include="natural-uncertainty-csharp-api">
+        <HintPath>..\..\natural-uncertainty-csharp-api\natural-uncertainty-csharp-api\bin\Debug\net7.0\natural-uncertainty-csharp-api.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="Views\Shared\_NaturalUncertaintySolveResult.cshtml" />
+    </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿@model DecisionWrapperCsharp.TaskProcess
+﻿@model NaturalUncertaintyCsharpApi.TaskProcess
 
 @{
     string[] sidebar = {};
@@ -9,6 +9,11 @@
 @for (int i = 0; i < Model.Count; i++)
 {
     var info = Model[i];
+
+    if (info == null)
+    {
+        continue;
+    }
     
     if (info.StepType() == "text")
     {
@@ -65,24 +70,6 @@
                         @foreach (var num in Model[j].AsString().Split("|"))
                         {
                             <td>@num</td>
-                        }
-                    </tr>
-                }
-                
-                if (info.StepType() == "srow")
-                {
-                    var row = @Model[j].AsString().Split("|");
-                    
-                    <tr>
-                        @if (withSidebar)
-                        {
-                            <th scope="col">@sidebar[sidebarCounter]</th>
-                            sidebarCounter++;
-                        }
-                        
-                        @for (int ii = 0; ii < row.Length; ii+=2)
-                        {
-                            <td style="background-color: @row[ii]">@row[ii + 1]</td>   
                         }
                     </tr>
                 }

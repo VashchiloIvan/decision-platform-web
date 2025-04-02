@@ -1,7 +1,9 @@
 using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity.Inner;
+using DecisionWrapperCsharp;
+using CriteriaRelation = DecisionPlatformWeb.Entity.Inner.CriteriaRelation;
 
-namespace DecisionPlatformWeb.Service.Parser;
+namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 
 public class CriteriaRelationParser
 {
@@ -12,7 +14,7 @@ public class CriteriaRelationParser
         _config = config;
     }
 
-    public CriteriaRelation ProduceCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation? relation)
+    public DecisionWrapperCsharp.CriteriaRelation ProduceCriteriaRelation(MathModel model, CriteriaRelation? relation)
     {
         var method = "";
 
@@ -53,7 +55,7 @@ public class CriteriaRelationParser
     }
 
 
-    private CriteriaRelation produceAllCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation relation)
+    private DecisionWrapperCsharp.CriteriaRelation produceAllCriteriaRelation(MathModel model, CriteriaRelation relation)
     {
         var criterias = getCriteriaMap(model);
         
@@ -67,7 +69,7 @@ public class CriteriaRelationParser
         return new AllCriteriaRelation(result);
     }
 
-    private CriteriaRelation produceSimpleRankingMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
+    private DecisionWrapperCsharp.CriteriaRelation produceSimpleRankingMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
     {
         var criterias = getCriteriaMap(model);
 
@@ -76,7 +78,7 @@ public class CriteriaRelationParser
         return new SimpleRankingMethod(model.getCriteriaList().Count, map);
     }
 
-    private CriteriaRelation produceProportionalMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
+    private DecisionWrapperCsharp.CriteriaRelation produceProportionalMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
     {
         var criterias = getCriteriaMap(model);
 
@@ -85,7 +87,7 @@ public class CriteriaRelationParser
         return new ProportionalMethod(model.getCriteriaList().Count, map);
     }
 
-    private CriteriaRelation produceSimpleCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation relation)
+    private DecisionWrapperCsharp.CriteriaRelation produceSimpleCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation relation)
     {
         TwoCriteriaRelationList relationList = new TwoCriteriaRelationList();
 

@@ -1,4 +1,4 @@
-﻿namespace DecisionPlatformWeb.Entity.Inner;
+﻿namespace DecisionPlatformWeb.Entity.MultiCriteriaSolving.Inner;
 
 public class Alternative
 {

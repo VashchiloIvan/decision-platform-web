@@ -1,8 +1,10 @@
 using DecisionPlatformWeb.Config.MultiCriteriaConfigComponents;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
+using DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
+using DecisionWrapperCsharp;
 
-namespace DecisionPlatformWeb.Service.Parser;
+namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 
 public class NormalizerParser
 {

@@ -3,6 +3,7 @@ using DecisionPlatformWeb.Entity;
 using DecisionPlatformWeb.Models;
 using DecisionPlatformWeb.Service.Cache;
 using DecisionPlatformWeb.Service.Parser;
+using DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 using DecisionPlatformWeb.Service.Solver;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

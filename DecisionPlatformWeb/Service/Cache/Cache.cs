@@ -15,7 +15,7 @@ public class Cache
     public Cache(double minutes)
     {
         _cache = new Dictionary<Guid, (MultiStepSolver Data, Timer ExpirationTimer)>();
-        _defaultTimeout = minutes * 60 * 1000;
+        _defaultTimeout = (minutes + 1) * 60 * 1000;
     }
 
     public Guid AddObject(MultiStepSolver obj)

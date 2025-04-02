@@ -580,7 +580,7 @@ function addAdditionalMethodOnSelectChanged(e, src) {
             if (additional[parameter].type === "select") {
                 res += "<select class=\"form-select mb-3\">" + "<option value='non' selected>Choose...</option>";
                 additional[parameter].selectList.forEach(val => {
-                    res += "<option value='" + val.method + "'>" + val.name + "</option>"
+                    res += "<option value='" + val.name + "'>" + val.name + "</option>"
                 })
                 res += "</select>"
             }
@@ -606,7 +606,7 @@ function addAdditionalMethodOnSelectChanged(e, src) {
             if (additional[parameter].type === "checkboxList") {
                 res += "<div class=\"form-check\">"
                 additional[parameter].selectList.forEach(val => {
-                    res += "<label>" + "<input class='form-check-input' type=\"checkbox\" name=\"" + parameter + "\" " + "value=\"" + val.method + "\" checked>" + val.name + "</label><br>"
+                    res += "<label>" + "<input class='form-check-input' type=\"checkbox\" name=\"" + parameter + "\" " + "value=\"" + val.name + "\" checked>" + val.name + "</label><br>" 
                 })
                 res += "</div>"
             }
@@ -799,7 +799,7 @@ function getMethodInfo() {
 // SOLVE
 function onSolveBtnClick(e) {
     $.ajax({
-        url: "solve-task",
+        url: "/solve-task",
         type: "POST",
         data: JSON.stringify(buildSolveModel()),
         contentType: 'application/json; charset=utf-8',
@@ -839,7 +839,7 @@ function onImportFileSelected(e) {
 
     $.ajax({
         type: "POST",
-        url: 'import',
+        url: '/import',
         cache: false,
         contentType: false,
         processData: false,
