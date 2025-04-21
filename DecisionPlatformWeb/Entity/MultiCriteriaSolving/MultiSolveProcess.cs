@@ -1,5 +1,5 @@
 using DecisionPlatformWeb.Entity.Inner;
-using DecisionWrapperCsharp;
+using MultiCriteriaCsharpApi;
 
 namespace DecisionPlatformWeb.Entity;
 

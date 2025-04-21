@@ -1,7 +1,7 @@
 using DecisionPlatformWeb.Config.MultiCriteriaConfigComponents;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
-using DecisionWrapperCsharp;
+using MultiCriteriaCsharpApi;
 
 namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 

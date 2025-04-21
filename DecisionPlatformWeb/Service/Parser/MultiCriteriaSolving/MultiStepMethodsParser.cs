@@ -3,7 +3,7 @@ using DecisionPlatformWeb.Entity;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
 using DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
-using DecisionWrapperCsharp;
+using MultiCriteriaCsharpApi;
 using Microsoft.Extensions.Options;
 using CriteriaRelation = DecisionPlatformWeb.Entity.Inner.CriteriaRelation;
 using DecisionMakerInfo = DecisionPlatformWeb.Entity.Inner.DecisionMakerInfo;
@@ -32,7 +32,7 @@ public class MultiStepMethodsParser
         }
     }
     
-    public MultiStepMethod Parse(MathModel model, DecisionWrapperCsharp.CriteriaRelation relation, Method methodInfo)
+    public MultiStepMethod Parse(MathModel model, MultiCriteriaCsharpApi.CriteriaRelation relation, Method methodInfo)
     {
         MultiStepMethod method;
         
@@ -103,7 +103,7 @@ public class MultiStepMethodsParser
         }
     }
     
-    public DecisionWrapperCsharp.DecisionMakerInfo Parse(Method methodInfo, MakerInfo info)
+    public MultiCriteriaCsharpApi.DecisionMakerInfo Parse(Method methodInfo, MakerInfo info)
     {
         switch (methodInfo.Name)
         {

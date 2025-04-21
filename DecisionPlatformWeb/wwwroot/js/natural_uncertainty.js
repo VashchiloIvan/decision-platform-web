@@ -10,8 +10,6 @@ $(document).ready(function () {
     const criteriaList = new CriteriaList('.nu-criterias-select', 'button.nu-add-criteria', nuConfig);
 
     const solver = new Solver("button.nu-solve", "div.nu-solving", criteriaList, mathModelTable);
-    
-    // const importExport = new ModelIO("button.nu-import", "a.nu-export-json", "a.nu-export-xml", mathModelTable, criteriaList);
 })
 
 class Table {
@@ -35,6 +33,30 @@ class Table {
         this.columns.forEach(columnName => {
             const $cell = $('<td>').html(`<input type="number" class="form-control" data-row="${rowName}" data-column="${columnName}" />`);
             $row.append($cell);
+        });
+
+        this.$table.find('tbody').append($row);
+    }
+
+    addRowWithMarks(rowName, marks = []) {
+        if (this.rows.has(rowName)) {
+            console.warn(`Строка с названием "${rowName}" уже существует.`);
+            return;
+        }
+
+        this.rows.add(rowName);
+
+        const $row = $('<tr>').attr('data-row-name', rowName);
+        $row.append($('<th>').attr('scope', 'row').text(rowName));
+
+        let index = 0;
+        this.columns.forEach(columnName => {
+            const value = marks[index] != null ? marks[index] : '';
+            const $cell = $('<td>').html(
+                `<input type="number" class="form-control" data-row="${rowName}" data-column="${columnName}" value="${value}" />`
+            );
+            $row.append($cell);
+            index++;
         });
 
         this.$table.find('tbody').append($row);
@@ -141,10 +163,11 @@ class UlList {
     }
 
     initEvents() {
-        this.$addButton.on('click', () => this.addItem());
+        this.$addButton.on('click', () => this.addItemFromUi());
     }
 
-    addItem() {
+    // 📌 Новый метод — из UI
+    addItemFromUi() {
         const inputValue = this.$addButton.closest('li').find('input').val().trim();
 
         if (!inputValue) {
@@ -158,31 +181,38 @@ class UlList {
         }
 
         if (!inputValue.match(/^[а-яА-Яa-zA-Z0-9\s]+$/)) {
-            this.showValidationError('Название критерия может содержать только буквы и цифры');
+            this.showValidationError('Название может содержать только буквы и цифры');
             return;
         }
 
+        this.addItem(inputValue); // Вызываем универсальный метод
+        this.$addButton.closest('li').find('input').val('');
+    }
+
+    addItem(name, marks = []) {
         const $newItem = $(`
             <li class="list-group-item">
                 <div class="d-flex justify-content-between">
-                    <span>${inputValue}</span>
-                    <button type="button" class="btn btn-danger btn-sm bi bi-trash" data-toggle="tooltip" data-placement="top" title="Удалить" aria-label="Удалить"></button>
+                    <span>${name}</span>
+                    <button type="button" class="btn btn-danger btn-sm bi bi-trash" data-toggle="tooltip" title="Удалить" aria-label="Удалить"></button>
                 </div>
             </li>
         `);
 
         this.$list.append($newItem);
-        this.items.add(inputValue);
+        this.items.add(name);
 
         if (this.isRowType) {
-            this.table.addRow(inputValue);
+            if (marks.length > 0) {
+                this.table.addRowWithMarks(name, marks);
+            } else {
+                this.table.addRow(name);
+            }
         } else {
-            this.table.addColumn(inputValue);
+            this.table.addColumn(name);
         }
 
-        this.$addButton.closest('li').find('input').val('');
-
-        $newItem.find('.bi-trash').on('click', () => this.removeItem($newItem, inputValue));
+        $newItem.find('.bi-trash').on('click', () => this.removeItem($newItem, name));
     }
 
     removeItem($item, name) {
@@ -192,7 +222,7 @@ class UlList {
         if (this.isRowType) {
             this.table.removeRow(name);
         } else {
-            this.table.removeColumn(name)
+            this.table.removeColumn(name);
         }
     }
 
@@ -504,5 +534,133 @@ class Solver {
                 solveResult.empty();
             }
         });
+    }
+}
+
+class ImportExportHandler {
+    constructor(importBtnSelector, exportJsonBtnSelector, exportXmlBtnSelector, endpoints, lists) {
+        this.$importBtn = $(importBtnSelector);
+        this.$exportJsonBtn = $(exportJsonBtnSelector);
+        this.$exportXmlBtn = $(exportXmlBtnSelector);
+        this.importEndpoint = endpoints.import;
+        this.exportJsonEndpoint = endpoints.exportJson;
+        this.exportXmlEndpoint = endpoints.exportXml;
+
+        // Ссылки на списки
+        this.uncertaintyUl = lists.uncertaintyUl;
+        this.alternativeUl = lists.alternativeUl;
+        this.criteriaList = lists.criteriaList;
+
+        this.initEvents();
+    }
+
+    initEvents() {
+        this.$importBtn.on('click', () => this.handleImport());
+        this.$exportJsonBtn.on('click', () => this.handleExport(this.exportJsonEndpoint));
+        this.$exportXmlBtn.on('click', () => this.handleExport(this.exportXmlEndpoint));
+    }
+
+    handleImport() {
+        const $fileInput = $('<input type="file" accept=".json,.xml" style="display: none;">');
+        $('body').append($fileInput);
+
+        $fileInput.on('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            $.ajax({
+                url: this.importEndpoint,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: (data) => this.populateInterface(data),
+                error: () => alert("Ошибка при импорте файла. Проверьте формат и повторите попытку."),
+                complete: () => $fileInput.remove()
+            });
+        });
+
+        $fileInput.click();
+    }
+
+    handleExport(endpoint) {
+        window.open(endpoint, '_blank');
+    }
+
+    populateInterface(data) {
+        // Очистка текущих данных
+        this.clearLists();
+
+        const model = data.mathModel;
+        const criterias = data.criterias;
+
+        // Импорт неопределенностей
+        if (Array.isArray(model.uncertainties)) {
+            model.uncertainties.forEach(u => this.uncertaintyUl.addItem(u));
+        }
+
+        // Импорт альтернатив
+        if (model.alternatives && typeof model.alternatives === 'object') {
+            for (const [altName, marks] of Object.entries(model.alternatives)) {
+                this.alternativeUl.addItem(altName, marks);
+            }
+        }
+        
+        // Импорт критериев
+        if (Array.isArray(criterias)) {
+            criterias.forEach(c => {
+                const method = c.criteria;
+                const params = c.parameters || [];
+
+                const configCriteria = this.criteriaList.config.criterias.find(k => k.method === method);
+                if (!configCriteria) return;
+
+                const $newItem = $('<li>', {
+                    class: 'list-group-item d-flex justify-content-between align-items-center',
+                }).append(
+                    $('<div>', { class: 'vals' }).append(
+                        $('<p>', {
+                            class: 'name fw-bold',
+                            text: configCriteria.name,
+                            attr: { 'data-method': method },
+                        }),
+                        ...(params.map(param => {
+                            const configParam = this.criteriaList.config.parameters.find(p => p.key === Object.keys(param)[0]);
+                            const key = Object.keys(param)[0];
+                            const value = param[key];
+                            return $('<p>', {
+                                text: `${configParam ? configParam.name : key}: ${value}`,
+                                attr: {
+                                    'data-parameter': key,
+                                    'data-parameter-value': value,
+                                }
+                            });
+                        }))
+                    ),
+                    $('<div>').append(
+                        $('<button>', {
+                            type: 'button',
+                            class: 'btn btn-danger btn-sm bi bi-trash',
+                            title: 'Удалить метод',
+                            'aria-label': 'Удалить метод'
+                        })
+                    )
+                );
+
+                this.criteriaList.$list.append($newItem);
+            });
+        }
+    }
+
+    clearLists() {
+        this.uncertaintyUl.$list.empty();
+        this.uncertaintyUl.items.clear();
+        this.alternativeUl.$list.empty();
+        this.alternativeUl.items.clear();
+        this.criteriaList.$list.find('li:gt(0)').remove(); // Оставить первую li с селектом
+        this.criteriaList.table.clear(); // если есть метод очистки таблицы
     }
 }

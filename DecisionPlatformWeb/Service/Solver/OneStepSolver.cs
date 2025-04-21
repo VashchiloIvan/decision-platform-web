@@ -1,7 +1,7 @@
 using DecisionPlatformWeb.Entity;
 using DecisionPlatformWeb.Service.Parser;
 using DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
-using DecisionWrapperCsharp;
+using MultiCriteriaCsharpApi;
 
 namespace DecisionPlatformWeb.Service.Solver;
 

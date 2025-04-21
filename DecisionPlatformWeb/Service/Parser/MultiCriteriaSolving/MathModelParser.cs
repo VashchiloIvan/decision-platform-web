@@ -1,4 +1,4 @@
-using DecisionWrapperCsharp;
+using MultiCriteriaCsharpApi;
 
 namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 

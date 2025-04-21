@@ -1,7 +1,7 @@
 using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity.Inner;
 using DecisionPlatformWeb.Exceptions;
-using DecisionWrapperCsharp;
+using MultiCriteriaCsharpApi;
 using Microsoft.Extensions.Options;
 
 namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
@@ -18,6 +18,7 @@ public class OneStepMethodsParser
     private readonly MinMaxValuesParser _minMaxValuesParser;
     private readonly PrometheeCheckedMethodsParser _prometheeCheckedMethodsParser;
     private readonly CriteriaFunctionTypesParser _criteriaFunctionTypesParser;
+    private readonly ScaleFactorParser _scaleFactorParser;
 
     public OneStepMethodsParser(IOptions<MultiCriteriaSolvingConfig> config)
     {
@@ -27,6 +28,7 @@ public class OneStepMethodsParser
         _minMaxValuesParser = new MinMaxValuesParser(cfg.OptionalMethods);
         _prometheeCheckedMethodsParser = new PrometheeCheckedMethodsParser(cfg.OptionalMethods);
         _criteriaFunctionTypesParser = new CriteriaFunctionTypesParser(cfg.OptionalMethods);
+        _scaleFactorParser = new ScaleFactorParser(cfg.OptionalMethods);
 
         var supported = new[]
         {
@@ -41,7 +43,7 @@ public class OneStepMethodsParser
         }
     }
 
-    public OneStepMethods Parse(MathModel model, DecisionWrapperCsharp.CriteriaRelation relation, MethodInfo methodInfo)
+    public OneStepMethods Parse(MathModel model, MultiCriteriaCsharpApi.CriteriaRelation relation, MethodInfo methodInfo)
     {
         OneStepMethods methods = new OneStepMethods();
 
@@ -53,7 +55,7 @@ public class OneStepMethodsParser
         return methods;
     }
 
-    private OneStepMethod parse(MathModel model, DecisionWrapperCsharp.CriteriaRelation relation, Method methodInfo)
+    private OneStepMethod parse(MathModel model, MultiCriteriaCsharpApi.CriteriaRelation relation, Method methodInfo)
     {
         OneStepMethod method;
 
@@ -120,12 +122,14 @@ public class OneStepMethodsParser
 
         var list = _criteriaFunctionTypesParser.Parse(methodInfo.AdditionalMethods);
         var prometheeCheckedMethods = _prometheeCheckedMethodsParser.Parse(methodInfo.AdditionalMethods);
+        var scaleFactor = _scaleFactorParser.Parse(methodInfo.AdditionalMethods);
 
         method.setCriterionTypes(new CriterionTypes(list));
         method.useMethodVersions(
             prometheeCheckedMethods.usePrometheeI,
             prometheeCheckedMethods.usePrometheeII,
             prometheeCheckedMethods.usePrometheeIII);
+        method.setScaleFactor(scaleFactor);
 
         return method;
     }

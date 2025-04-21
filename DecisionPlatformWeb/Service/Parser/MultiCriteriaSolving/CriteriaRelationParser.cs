@@ -1,6 +1,6 @@
 using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity.Inner;
-using DecisionWrapperCsharp;
+using MultiCriteriaCsharpApi;
 using CriteriaRelation = DecisionPlatformWeb.Entity.Inner.CriteriaRelation;
 
 namespace DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
@@ -14,7 +14,7 @@ public class CriteriaRelationParser
         _config = config;
     }
 
-    public DecisionWrapperCsharp.CriteriaRelation ProduceCriteriaRelation(MathModel model, CriteriaRelation? relation)
+    public MultiCriteriaCsharpApi.CriteriaRelation ProduceCriteriaRelation(MathModel model, CriteriaRelation? relation)
     {
         var method = "";
 
@@ -55,7 +55,7 @@ public class CriteriaRelationParser
     }
 
 
-    private DecisionWrapperCsharp.CriteriaRelation produceAllCriteriaRelation(MathModel model, CriteriaRelation relation)
+    private MultiCriteriaCsharpApi.CriteriaRelation produceAllCriteriaRelation(MathModel model, CriteriaRelation relation)
     {
         var criterias = getCriteriaMap(model);
         
@@ -69,7 +69,7 @@ public class CriteriaRelationParser
         return new AllCriteriaRelation(result);
     }
 
-    private DecisionWrapperCsharp.CriteriaRelation produceSimpleRankingMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
+    private MultiCriteriaCsharpApi.CriteriaRelation produceSimpleRankingMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
     {
         var criterias = getCriteriaMap(model);
 
@@ -78,7 +78,7 @@ public class CriteriaRelationParser
         return new SimpleRankingMethod(model.getCriteriaList().Count, map);
     }
 
-    private DecisionWrapperCsharp.CriteriaRelation produceProportionalMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
+    private MultiCriteriaCsharpApi.CriteriaRelation produceProportionalMethod(MathModel model, Entity.Inner.CriteriaRelation relation)
     {
         var criterias = getCriteriaMap(model);
 
@@ -87,7 +87,7 @@ public class CriteriaRelationParser
         return new ProportionalMethod(model.getCriteriaList().Count, map);
     }
 
-    private DecisionWrapperCsharp.CriteriaRelation produceSimpleCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation relation)
+    private MultiCriteriaCsharpApi.CriteriaRelation produceSimpleCriteriaRelation(MathModel model, Entity.Inner.CriteriaRelation relation)
     {
         TwoCriteriaRelationList relationList = new TwoCriteriaRelationList();
 

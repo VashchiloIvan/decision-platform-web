@@ -611,6 +611,10 @@ function addAdditionalMethodOnSelectChanged(e, src) {
                 res += "</div>"
             }
 
+            if (additional[parameter].type === "number") {
+                res += "<input type='number' class='form-control'/>"
+            }
+
             if (additional[parameter].type === "criteriaFuncTypes") {
                 var criterias = getCriteriaList()
 
@@ -704,6 +708,10 @@ function getMethodLiToList() {
             });
 
             paramValue = selected.join(", ")
+        }
+
+        if (p.hasClass("number")) {
+            paramValue = $(this).find("input.form-control").val()
         }
 
         if (p.hasClass("criteriaFuncTypes")) {
