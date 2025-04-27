@@ -21,6 +21,9 @@
       <Reference Include="natural-uncertainty-csharp-api">
         <HintPath>..\..\natural-uncertainty-csharp-api\natural-uncertainty-csharp-api\bin\Debug\net7.0\natural-uncertainty-csharp-api.dll</HintPath>
       </Reference>
+      <Reference Include="PowerIndeces-Lib">
+        <HintPath>..\..\PowerIndeces-Lib\PowerIndeces-Lib\bin\Debug\net7.0\PowerIndeces-Lib.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <ItemGroup>

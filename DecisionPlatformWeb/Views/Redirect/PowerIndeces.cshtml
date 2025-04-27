@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Игры взвешенного голосования";
+}
+
+<section>
+    <h1 class="display-6 mb-4">Игры взвешенного голосования</h1>
+    <div>
+        <div>
+            <p class="text-sm-start fs-3">Данные о игре</p>
+            <div class="input-group d-flex justify-content-between">
+                <div class="col-2">
+                    <label for="quota">Квота</label>
+                    <input id="quota" type="number" class="form-control">
+                </div>
+                <div class="col-2">
+                    <label for="quotaType">Тип квоты</label>
+                    <select id="quotaType" class="form-select">
+                        <option selected value="0">Достижение</option>
+                        <option value="1">Превышение</option>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <label id="count" for="playerCount">Количество игроков</label>
+                    <input type="number" id="playerCount" class="form-control">
+                </div>
+                <div class="col-2">
+                    <label for="calcType">Тип вычисления</label>
+                    <select id="calcType" class="form-select">
+                        <option selected value="0">Прямое перечисление</option>
+                        <option value="1">Производящие функции</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="mt-2">
+            <p class="text-sm-start fs-3">Информация о игроках</p>
+            <div class="mt-2 mb-2 col-6">
+                <div class="mb-2 d-flex justify-content-between border-bottom">
+                    <div class="col-5 mb-2 d-flex justify-content-center">
+                        <span><b>Наименование игрока</b></span>
+                    </div>
+                    <div class="col-5 mb-2 d-flex justify-content-center">
+                        <span><b>Вес игрока</b></span>
+                    </div>
+                </div>
+                <div class="players-table"></div>
+                <button class="btn btn-primary mb-2 mt-1 calc-pi-ss">Рассчитать "Шепли-Шубик"</button>
+                <button class="btn btn-primary mb-2 mt-1 calc-pi-banz">Рассчитать "Банцаф"</button>
+            </div>
+            <div class="w-100">
+                <table class="table table-hover text-center">
+                    <thead class="pi-info-head">
+                        <tr>
+                            <th>Игрок</th>
+                            <th>Вес</th>
+                            <th>Индекс влияния</th>
+                        </tr>
+                    </thead>
+                    <tbody class="pi-info-body"> </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/power_indeces.js"></script>
+</section>
