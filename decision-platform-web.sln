@@ -1,27 +1,43 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionPlatformWeb", "DecisionPlatformWeb\DecisionPlatformWeb.csproj", "{84E6E310-17A3-4B8A-8823-4B9D8C61341E}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DecisionPlatformWeb", "DecisionPlatformWeb\DecisionPlatformWeb.csproj", "{84E6E310-17A3-4B8A-8823-4B9D8C61341E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F5048DBF-1CC7-4097-BE7D-E0A07EB6425F}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionPlatformWeb.Tests", "DecisionPlatformWeb.Tests\DecisionPlatformWeb.Tests.csproj", "{7BA57175-994A-443F-9C85-304FD9182ED7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DecisionPlatformWeb.Tests", "DecisionPlatformWeb.Tests\DecisionPlatformWeb.Tests.csproj", "{7BA57175-994A-443F-9C85-304FD9182ED7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Debug|x64.Build.0 = Debug|Any CPU
 		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Release|x64.ActiveCfg = Release|Any CPU
+		{84E6E310-17A3-4B8A-8823-4B9D8C61341E}.Release|x64.Build.0 = Release|Any CPU
 		{7BA57175-994A-443F-9C85-304FD9182ED7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7BA57175-994A-443F-9C85-304FD9182ED7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BA57175-994A-443F-9C85-304FD9182ED7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7BA57175-994A-443F-9C85-304FD9182ED7}.Debug|x64.Build.0 = Debug|Any CPU
 		{7BA57175-994A-443F-9C85-304FD9182ED7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BA57175-994A-443F-9C85-304FD9182ED7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BA57175-994A-443F-9C85-304FD9182ED7}.Release|x64.ActiveCfg = Release|Any CPU
+		{7BA57175-994A-443F-9C85-304FD9182ED7}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

@@ -34,7 +34,14 @@ public class RedirectController : Controller
         
         return View();
     }
-    
+
+    public IActionResult PowerIndeces()
+    {
+        _logger.LogInformation("Redirect: PowerIndeces");
+
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
