@@ -43,17 +43,17 @@ public class CriteriaFunctionTypesParser
                 
                 if (sect.Contains("Порог безразличия"))
                 {
-                    q = double.Parse(sect.Split("-")[1]);
+                    q = double.Parse(sect.Split("-")[1].Replace(".", ","));
                 }
                 
                 if (sect.Contains("Порог строгого предпочтения"))
                 {
-                    r = double.Parse(sect.Split("-")[1]);
+                    r = double.Parse(sect.Split("-")[1].Replace(".", ","));
                 }
 
                 if (sect.Contains("Величина между порогом строгого предпочтения и базразличия"))
                 {
-                    sigma = double.Parse(sect.Split("-")[1]);
+                    sigma = double.Parse(sect.Split("-")[1].Replace(".", ","));
                 }
             }
 

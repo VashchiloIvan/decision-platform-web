@@ -16,6 +16,12 @@
         continue;
     }
     
+    if (info.StepType() == "bold")
+    {
+        <p class="mb-3"><b>@info.AsString()</b></p>
+        continue;
+    }
+    
     if (info.StepType() == "sidebar")
     {
         sidebar = info.AsString().Split("|");
