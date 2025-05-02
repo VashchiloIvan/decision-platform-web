@@ -1,9 +1,7 @@
 using DecisionPlatformWeb.Entity;
 using DecisionPlatformWeb.Entity.Inner;
-using DecisionPlatformWeb.Service.Parser;
 using DecisionPlatformWeb.Service.Parser.MultiCriteriaSolving;
 using MultiCriteriaCsharpApi;
-using CriteriaRelation = DecisionPlatformWeb.Entity.Inner.CriteriaRelation;
 
 namespace DecisionPlatformWeb.Service.Solver;
 
@@ -41,6 +39,7 @@ public class MultiStepSolver
         {
             Guid = default,
             Method = _method,
+            MathModel = _mathModel,
             Process = result.second.getProcess(),
             IsFinished = result.first.getStatus() == DecisionStatus.Optimal ||
                          result.first.getStatus() == DecisionStatus.Feasible ||
@@ -66,6 +65,7 @@ public class MultiStepSolver
         {
             Guid = info.Id,
             Method = _method,
+            MathModel = _mathModel,
             Process = process,
             IsFinished = result.first.getStatus() == DecisionStatus.Optimal ||
                          result.first.getStatus() == DecisionStatus.Feasible ||

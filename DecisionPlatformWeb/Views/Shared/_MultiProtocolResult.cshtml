@@ -1,69 +1,134 @@
-﻿@model DecisionPlatformWeb.Entity.MultiSolveProcess
+﻿@using DecisionPlatformWeb.Entity
+@model DecisionPlatformWeb.Entity.MultiSolveProcess
 
 @if (Model != null)
 {
-    <div class="steps">
-        <div>
-            @await Html.PartialAsync("_ProtocolResult", Model.Process)
-        </div>
+<div class="steps">
+    <div>
+        @await Html.PartialAsync("_ProtocolResult", Model.Process)
     </div>
-    <div class="solve-buttons">  
+</div>
+<div class="solve-buttons">
     @if (!Model.IsFinished && Model.IsValidModel)
     {
-        <div class="controls">
-            @foreach (var additionalInfoControl in Model.Controls)
+    <div class="controls">
+        @foreach (var control in Model.Controls)
+        {
+        if (control is InputInfoControl inputControl)
+        {
+        <div>
+            <p>@inputControl.Name</p>
+            <input type="@inputControl.InputType" class="form-control" />
+        </div>
+        }
+        else if (control is CriteriaTableInputsInfoControl tableControl)
+        {
+        <p>@tableControl.Name</p>
+        <table class="table table-bordered criteria-table">
+            <thead>
+            <tr>
+                <th>Критерий</th>
+                <th>Порог безразличия</th>
+                <th>Порог согласия</th>
+                <th>Порог вето</th>
+            </tr>
+            </thead>
+            <tbody>
+            @for (var i = 0; i < Model.MathModel.getCriteriaList().Count; i++)
             {
-                <div>
-                    <p>@additionalInfoControl.Name</p>
-                    <input type=@additionalInfoControl.InputType class="form-control" />
-                </div>
+            var criterion = Model.MathModel.getCriteriaList()[i];
+            <tr>
+                <td>@criterion.getName()</td>
+                <td><input type="number" class="form-control" name="Indifference_@i" /></td>
+                <td><input type="number" class="form-control" name="Preference_@i" /></td>
+                <td><input type="number" class="form-control" name="Veto_@i" /></td>
+            </tr>
             }
-            <div class="invalid-feedback">
-            </div>
+            </tbody>
+        </table>
+        }
+        }
+        <div class="invalid-feedback">
         </div>
-        <div class="multi-buttons mt-2">
-            <button class="btn btn-primary make-iteration" type="button">
-                Продолжить поиск решения
-            </button>
-            <button class="btn btn-secondary stop-solving" type="button">
-                Завершить поиск
-            </button>
-        </div>
-    }
     </div>
+
+    <div class="multi-buttons mt-2">
+        <button class="btn btn-primary make-iteration" type="button">
+            Продолжить поиск решения
+        </button>
+        <button class="btn btn-secondary stop-solving" type="button">
+            Завершить поиск
+        </button>
+    </div>
+    }
+</div>
 }
 <script type="text/javascript">
 $(function () {
-    function makeIteration (e) {
-        const controls = $('.controls div');
+    function makeIteration(e) {
+        const controls = $('.controls').children();
         const attributesArray = [];
 
-        console.log(controls)
+        console.log("1")
+        controls.each(function (index, control) {
+            const $control = $(control);
 
-        for (let i = 0; i < controls.length; i++) {
-            const control = controls[i];
-            
-            const input = control.querySelector('input');
-            if (!input) {
-                continue;
-            }
-            
-            const attributeValue = input.type === 'checkbox' ? input.checked : input.value;
+            if ($control.hasClass('criteria-table')) {
+                const rows = $control.find('tbody tr');
+                const criteriaArray = [];
 
-            if (attributeValue === "") {
-                showInvalidMessageOnClickInput(control,
-                    ".solve-buttons .controls .invalid-feedback", "Поле должно быть заполнено");
-                    
-                return
+                rows.each(function (idx, row) {
+                    const $row = $(row);
+                    const criterionName = $row.find('td').first().text().trim();
+                    const indifference = $row.find('input[name="Indifference_' + idx + '"]').val();
+                    const preference = $row.find('input[name="Preference_' + idx + '"]').val();
+                    const veto = $row.find('input[name="Veto_' + idx + '"]').val();
+
+                    if (indifference === "" || preference === "" || veto === "") {
+                        showInvalidMessageOnClickInput(row, ".solve-buttons .controls .invalid-feedback", "Все поля должны быть заполнены");
+                        return false;
+                    }
+
+                    criteriaArray.push({
+                        criterion: criterionName,
+                        thresholds: {
+                            indifference: parseFloat(indifference),
+                            preference: parseFloat(preference),
+                            veto: parseFloat(veto)
+                        }
+                    });
+                });
+                
+                attributesArray.push({
+                    type: "CriteriaTableInputsInfoControl",
+                    value: JSON.stringify(criteriaArray)
+                });
+
+                console.log(attributesArray)
             }
-            
-            attributesArray.push({ name: $(control).children('p').html(), value: attributeValue });
-        }
-        
+            else if ($control.find('input').length > 0) {
+                const name = $control.find('p').text().trim();
+                const input = $control.find('input')[0];
+                const attributeValue = input.type === 'checkbox' ? input.checked : input.value;
+
+                if (attributeValue === "") {
+                    showInvalidMessageOnClickInput(control, ".solve-buttons .controls .invalid-feedback", "Поле должно быть заполнено");
+                    return false;
+                }
+
+                attributesArray.push({
+                    type: "InputInfoControl",
+                    name: name,
+                    value: attributeValue
+                });
+            }
+        });
+
         let sendedData = {
-           "id": '@Model.Guid',
-           "parameters": attributesArray,
+            id: '@Model.Guid',
+            parameters: attributesArray,
         };
+
         $.ajax({
             url: "/make-iteration",
             method: "POST",
@@ -71,30 +136,30 @@ $(function () {
             contentType: "application/json; charset=utf-8",
             beforeSend: function () {
                 $(".steps").append(
-                "<div class=\"d-flex justify-content-center div-to-delete mb-5 mt-3\">" +
-                "  <div class=\"spinner-border\" role=\"status\">" +
-                "    <span class=\"visually-hidden\">Loading...</span>" +
-                "  </div>" +
-                "</div>")
+                    "<div class=\"d-flex justify-content-center div-to-delete mb-5 mt-3\">" +
+                    "  <div class=\"spinner-border\" role=\"status\">" +
+                    "    <span class=\"visually-hidden\">Loading...</span>" +
+                    "  </div>" +
+                    "</div>");
             },
             complete: function () {
-                $(".div-to-delete").remove() // loading spinner
+                $(".div-to-delete").remove();
             },
             success: function(response) {
-                $(".solve-buttons").remove() // solve buttons from previous step
-                $(".steps").addClass("old-steps")
-                $(".steps").append(response)
-                $(".old-steps").removeClass("steps")
+                $(".solve-buttons").remove();
+                $(".steps").addClass("old-steps");
+                $(".steps").append(response);
+                $(".old-steps").removeClass("steps");
             },
             error: function() {
-                console.log("Error on make-iteration")
+                console.log("Error on make-iteration");
             }
         });
     }
-    
-    function stopSolving (e) {            
+
+    function stopSolving (e) {
         let sendedData = {
-           "id": '@Model.Guid'
+            "id": '@Model.Guid'
         };
         $.ajax({
             url: "stop-solving",
@@ -110,7 +175,7 @@ $(function () {
             }
         });
     }
-    
+
     $(".make-iteration").on("click", makeIteration)
     $(".stop-solving").on("click", stopSolving)
 })

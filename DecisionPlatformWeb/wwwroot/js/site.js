@@ -98,10 +98,6 @@ function createCriteria(criteriaName, type) {
 
     // Добавить столбик в таблицу
     addCriteriaOnTable(criteria)
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
 }
 
 function deleteCriteria(e) {
@@ -171,19 +167,11 @@ function createAlternative(e) {
 
     $(".math-model .alternative-table tbody").append(getAlternativeTableItemHtml(newNum, criteriaCount));
     $(".math-model .alternative-table tbody .btn-danger").on("click", deleteAlternative);
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
 }
 
 function createAlternativeWithMarks(name, marks) {
     $(".math-model .alternative-table tbody").append(getFilledAlternativeTableItemHtml(name, marks));
     $(".math-model .alternative-table tbody .btn-danger").on("click", deleteAlternative);
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
 }
 
 function deleteAlternative(e) {
@@ -270,10 +258,6 @@ function fillCriteriaRelationTypeForm(e) {
     $(".criteria-relation .criteria-relation-form").html(innerHtml);
     // on add code
     $(".criteria-relation .criteria-relation-form .btn-primary").click(addRelationOnUlList);
-    // set toggle 
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
 }
 
 function fillCriteriaRelationTypeFormFromImportedData(name, infoList) {
@@ -315,11 +299,6 @@ function fillCriteriaRelationTypeFormFromImportedData(name, infoList) {
 
     if (name === "Порядковая информация") infoList.forEach(info => {
         addRelationOnUlListWithInfo(info);
-    })
-
-    // set toggle 
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
     })
 }
 
@@ -371,10 +350,6 @@ function addRelationOnUlList() {
 
     // on delete
     $(".criteria-relation .criteria-relation-form .btn-danger").click(deleteRelationFromList);
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    });
 }
 
 function addRelationOnUlListWithInfo(info) {
@@ -390,10 +365,6 @@ function addRelationOnUlListWithInfo(info) {
 
     // on delete
     $(".criteria-relation .criteria-relation-form .btn-danger").click(deleteRelationFromList);
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    });
 }
 
 function deleteRelationFromList(e) {
@@ -531,9 +502,6 @@ function onAddOneStepMethodLi(li) {
         $(".methods .method-select-div .list-group .btn-danger").click((e) => {
             $(e.target).parent().parent().remove()
         })
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
     }
 }
 
@@ -549,9 +517,6 @@ function getOneStepMethodInputForm() {
     result += "</select>";
     result += "<button type=\"button\" class=\"ms-2 btn btn-primary btn-sm bi bi-plus-lg\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Добавить метод\"></button>"
     result += "</div><div class='additional-info mt-3'></div></li></ul>";
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
     return result;
 }
 
