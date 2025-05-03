@@ -25,6 +25,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Redirect}/{action=MultiCriteriaSolving}/{id?}");
+    pattern: "{controller=Redirect}/{action=NaturalUncertainty}/{id?}");
 
 app.Run();

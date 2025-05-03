@@ -888,11 +888,11 @@ function onImportFileSelected(e) {
 
 // export 
 function onExportXmlBtnClick(e) {
-    onExportFileSelected("export-xml", "model.xml");
+    onExportFileSelected("/export-xml", "model.xml");
 }
 
 function onExportJsonBtnClick(e) {
-    onExportFileSelected("export-json", "model.json");
+    onExportFileSelected("/export-json", "model.json");
 }
 
 function onExportFileSelected(url, filename) {
@@ -910,9 +910,7 @@ function onExportFileSelected(url, filename) {
             document.body.appendChild(a);
             a.click();
         },
-        error: function () {
-            // alert("QweQWEQWe")
-        }
+        error: function () {}
     })
 }
 
@@ -928,15 +926,12 @@ function onCriteriaFunctionTypeChanged(e) {
         
         switch (value[i]){
             case "r":
-                // item = "<label class=\"form-label\"></label>" 
                 item = "<input type=\"number\" class=\"form-control\" placeholder='Порог строгого предпочтения'>"
                 break
             case "q":
-                // item = "<label class=\"form-label\"></label>"
                 item = "<input type=\"number\" class=\"form-control\" placeholder='Порог безразличия'>"
                 break
             case "sigma":
-                // item = "<label class=\"form-label\"></label>"
                 item = "<input type=\"number\" class=\"form-control\" placeholder='Величина между порогом строгого предпочтения и базразличия'>"
                 break
             default:

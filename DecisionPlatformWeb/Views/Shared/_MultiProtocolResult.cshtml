@@ -9,7 +9,7 @@
     </div>
 </div>
 <div class="solve-buttons">
-    @if (!Model.IsFinished && Model.IsValidModel)
+    @if (!Model.IsFinished)
     {
     <div class="controls">
         @foreach (var control in Model.Controls)
@@ -162,7 +162,7 @@ $(function () {
             "id": '@Model.Guid'
         };
         $.ajax({
-            url: "stop-solving",
+            url: "/stop-solving",
             method: "POST",
             data: JSON.stringify(sendedData),
             contentType: "application/json; charset=utf-8",

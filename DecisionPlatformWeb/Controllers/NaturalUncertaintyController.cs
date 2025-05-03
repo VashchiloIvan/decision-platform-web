@@ -1,9 +1,10 @@
 using DecisionPlatformWeb.Config;
 using DecisionPlatformWeb.Entity.NaturalUncertainty;
-using DecisionPlatformWeb.Models;
 using DecisionPlatformWeb.Service.Parser.NaturalUncertainty;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using NaturalUncertaintyCsharpApi;
+using MathModelParser = DecisionPlatformWeb.Service.Parser.NaturalUncertainty.MathModelParser;
 
 namespace DecisionPlatformWeb.Controllers;
 
@@ -15,13 +16,17 @@ public class NaturalUncertaintyController : Controller
     private readonly NaturalUncertaintyConfig _config;
     private readonly MathModelParser _mathModelParser;
     private readonly CriteriaParser _criteriaParser;
+    private readonly ProbabilisticModelParser _probablisticModelParser;
+    private readonly ProbabilityCriteriaParser _probabilityCriteriaParser;
 
     public NaturalUncertaintyController(ILogger<RedirectController> logger, IOptions<NaturalUncertaintyConfig> config)
     {
         _logger = logger;
         _config = config.Value;
         _mathModelParser = new MathModelParser();
+        _probablisticModelParser = new ProbabilisticModelParser();
         _criteriaParser = new CriteriaParser(_config);
+        _probabilityCriteriaParser = new ProbabilityCriteriaParser(_config);
     }
 
     [HttpGet("nu-config")]
@@ -37,8 +42,18 @@ public class NaturalUncertaintyController : Controller
     [HttpPost("nu-solve")]
     public IActionResult SolveTask([FromBody] RequestData taskCondition)
     {
-        var parsedMathModel = _mathModelParser.Parse(taskCondition.MathModel);
-        var criteriaList = _criteriaParser.Parse(taskCondition.Criterias, parsedMathModel);
+        List<Criterion> criteriaList = new List<Criterion>();
+
+        if (!taskCondition.WithProbabilities)
+        {
+            var parsedMathModel = _mathModelParser.Parse(taskCondition.MathModel);
+            criteriaList = _criteriaParser.Parse(taskCondition.Criterias, parsedMathModel);   
+        }
+        else
+        {
+            var parsedProbablisticModel = _probablisticModelParser.Parse(taskCondition.MathModel);
+            criteriaList = _probabilityCriteriaParser.Parse(taskCondition.Criterias, parsedProbablisticModel);
+        }
 
         var protocols = new Protocols();
         for (int i = 0; i < criteriaList.Count; i++)
@@ -49,7 +64,16 @@ public class NaturalUncertaintyController : Controller
             criterion.solve();
             var process = criterion.getProcess();
 
-            var criteriaName = _config.Criterias.First(cr => cr.Method == taskCondition.Criterias[i].CriteriaName).Name;
+            var criteriaName = "";
+            if (taskCondition.WithProbabilities)
+            {
+                criteriaName = _config.WithProbabilityCriterias.First(cr => cr.Method == taskCondition.Criterias[i].CriteriaName).Name;    
+            }
+            else
+            {
+                criteriaName = _config.WithoutProbabilityCriterias.First(cr => cr.Method == taskCondition.Criterias[i].CriteriaName).Name;
+            }
+            
             var parameters = new List<CriteriaParameter>();
             
             foreach (var parameter in taskCondition.Criterias[i].Parameters)

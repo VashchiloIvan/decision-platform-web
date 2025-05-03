@@ -5,5 +5,6 @@ namespace DecisionPlatformWeb.Config;
 public class NaturalUncertaintyConfig
 {
     public Parameter[] Parameters { get; set; }
-    public Criteria[] Criterias { get; set; }
+    public Criteria[] WithoutProbabilityCriterias { get; set; }
+    public Criteria[] WithProbabilityCriterias { get; set; }
 }

@@ -2,29 +2,31 @@ using NaturalUncertaintyCsharpApi;
 
 namespace DecisionPlatformWeb.Service.Parser.NaturalUncertainty;
 
-public class MathModelParser
+public class ProbabilisticModelParser
 {
-    public MathModel Parse(Entity.NaturalUncertainty.MathModel condition)
+    public ProbabilisticModel Parse(Entity.NaturalUncertainty.MathModel condition)
     {
         UncertaintyList uncertainties = new UncertaintyList();
         foreach (var conditionUncertainty in condition.Uncertainties)
         {
             uncertainties.Add(new Uncertainty(conditionUncertainty));
         }
-        
-        AlternativeList alternatives = new AlternativeList();
+
+        ProbabilisticAlternativeList alternatives = new ProbabilisticAlternativeList();
         foreach (var (alternativeName, paramsArray) in condition.Alternatives)
         {
             var marks = new DoubleList();
-            
+            var probabilities = new DoubleList();
+
             foreach (var alternativeParams in paramsArray)
             {
                 marks.Add(alternativeParams.Mark);
+                probabilities.Add(alternativeParams.Probability);
             }
 
-            alternatives.Add(new Alternative(alternativeName, marks));
+            alternatives.Add(new ProbabilisticAlternative(alternativeName, marks, probabilities));
         }
 
-        return new MathModel(alternatives, uncertainties);
+        return new ProbabilisticModel(alternatives, uncertainties);
     }
 }

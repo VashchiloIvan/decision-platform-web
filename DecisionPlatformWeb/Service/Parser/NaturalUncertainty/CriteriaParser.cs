@@ -19,7 +19,7 @@ public class CriteriaParser
 
     public CriteriaParser(NaturalUncertaintyConfig config)
     {
-        _criteriaArray = config.Criterias;
+        _criteriaArray = config.WithoutProbabilityCriterias;
 
         foreach (var criteria in _criteriaArray)
         {

@@ -4,19 +4,34 @@ $(document).ready(function () {
     fetchMethodInfo("nu-config");
 
     const mathModelTable = new Table("table.nu-mathmodel-table");
+
     const uncertaintyUl = new UlList("ul.nu-uncertainty-list", "button.nu-add-uncertainty", mathModelTable, false);
     const alternativeUl = new UlList("ul.nu-alternative-list", "button.nu-add-alternative", mathModelTable, true);
 
     const criteriaList = new CriteriaList('.nu-criterias-select', 'button.nu-add-criteria', nuConfig);
 
     const solver = new Solver("button.nu-solve", "div.nu-solving", criteriaList, mathModelTable);
+
+    $('#toggleProbabilities').on('change', function () {
+        if (this.checked) {
+            mathModelTable.addProbabilities();
+            criteriaList.withProbabilities();
+        } else {
+            mathModelTable.removeProbabilities();
+            criteriaList.withoutProbabilities();
+        }
+    });
+
+    $("a.nu-export-xml").click(e => onExportXmlBtnClick(criteriaList, mathModelTable))
+    $("a.nu-export-json").click(e => onExportJsonBtnClick(criteriaList, mathModelTable))
 })
 
 class Table {
     constructor(selector) {
         this.$table = $(selector);
-        this.rows = new Set(); // Множество для хранения названий строк
-        this.columns = new Set(); // Множество для хранения названий столбцов
+        this.rows = new Set();
+        this.columns = new Set();
+        this.withProbabilities = false;
     }
 
     // Добавление строки
@@ -30,9 +45,22 @@ class Table {
 
         const $row = $('<tr>').attr('data-row-name', rowName);
         $row.append($('<th>').attr('scope', 'row').text(rowName));
+
         this.columns.forEach(columnName => {
-            const $cell = $('<td>').html(`<input type="number" class="form-control" data-row="${rowName}" data-column="${columnName}" />`);
-            $row.append($cell);
+            // Добавляем ячейку с значением
+            const $valueCell = $('<td>').html(
+                `<input type="number" class="form-control" data-row="${rowName}" data-column="${columnName}" />`
+            );
+            $row.append($valueCell);
+
+            // Если включены вероятности, добавляем ячейку для вероятности
+            if (this.withProbabilities) {
+                const $probCell = $('<td class="probability">').html(
+                    `<input type="number" class="form-control probability-input" 
+                     data-row="${rowName}" data-column="p(${columnName})" min="0" max="1" step="0.01" />`
+                );
+                $row.append($probCell);
+            }
         });
 
         this.$table.find('tbody').append($row);
@@ -52,10 +80,18 @@ class Table {
         let index = 0;
         this.columns.forEach(columnName => {
             const value = marks[index] != null ? marks[index] : '';
-            const $cell = $('<td>').html(
+            const $valueCell = $('<td>').html(
                 `<input type="number" class="form-control" data-row="${rowName}" data-column="${columnName}" value="${value}" />`
             );
-            $row.append($cell);
+            $row.append($valueCell);
+
+            if (this.withProbabilities) {
+                const $probCell = $('<td class="probability">').html(
+                    `<input type="number" class="form-control probability-input" 
+                     data-row="${rowName}" data-column="p(${columnName})" min="0" max="1" step="0.01" />`
+                );
+                $row.append($probCell);
+            }
             index++;
         });
 
@@ -71,15 +107,34 @@ class Table {
 
         this.columns.add(columnName);
 
-        this.$table.find('thead tr').append($('<th>').text(columnName));
+        // Добавляем заголовок столбца
+        const $header = $('<th>').text(columnName);
+        this.$table.find('thead tr').append($header);
 
+        // Если включены вероятности, добавляем заголовок для вероятности
+        if (this.withProbabilities) {
+            $header.after($('<th class="probability">').text(`p(${columnName})`));
+        }
+
+        // Добавляем ячейки для всех строк
         this.rows.forEach(rowName => {
-            const $cell = $('<td>').html(`<input type="number" class="form-control" data-row="${rowName}" data-column="${columnName}" />`);
-            this.$table.find(`tr[data-row-name="${rowName}"]`).append($cell);
+            const $row = this.$table.find(`tr[data-row-name="${rowName}"]`);
+            const $valueCell = $('<td>').html(
+                `<input type="number" class="form-control" data-row="${rowName}" data-column="${columnName}" />`
+            );
+            $row.append($valueCell);
+
+            if (this.withProbabilities) {
+                const $probCell = $('<td class="probability">').html(
+                    `<input type="number" class="form-control probability-input" 
+                     data-row="${rowName}" data-column="p(${columnName})" min="0" max="1" step="0.01" />`
+                );
+                $row.append($probCell);
+            }
         });
     }
 
-    // Удаление строки
+    // Удаление строки (остается без изменений)
     removeRow(rowName) {
         if (!this.rows.has(rowName)) {
             console.warn(`Строка с названием "${rowName}" не найдена.`);
@@ -90,7 +145,7 @@ class Table {
         this.$table.find(`tr[data-row-name="${rowName}"]`).remove();
     }
 
-    // Удаление столбца
+    // Удаление столбца (обновлено для работы с вероятностями)
     removeColumn(columnName) {
         if (!this.columns.has(columnName)) {
             console.warn(`Столбец с названием "${columnName}" не найден.`);
@@ -99,19 +154,62 @@ class Table {
 
         this.columns.delete(columnName);
 
+        // Удаляем основной заголовок столбца
         this.$table.find('thead th').each(function () {
-            if ($(this).text() === columnName) {
+            if ($(this).text() === columnName || $(this).text() === `p(${columnName})`) {
                 $(this).remove();
             }
         });
 
-        this.$table.find(`input[data-column="${columnName}"]`).closest('td').remove();
+        // Удаляем все соответствующие ячейки
+        this.$table.find(`input[data-column="${columnName}"], input[data-column="p(${columnName})"]`)
+            .closest('td').remove();
     }
 
-    // Получение данных из таблицы
+    addProbabilities() {
+        if (this.withProbabilities) {
+            return; // Вероятности уже добавлены
+        }
+
+        this.withProbabilities = true;
+
+        // Добавляем столбцы вероятностей для каждого существующего столбца
+        const columns = Array.from(this.columns);
+        columns.forEach((columnName, index) => {
+            // Вставляем новый заголовок для вероятности после текущего столбца
+            const $header = this.$table.find('thead th').filter((i, el) => $(el).text() === columnName);
+            $header.after($('<th class="probability">').text(`p(${columnName})`));
+
+            // Добавляем ячейки вероятностей для каждой строки
+            this.rows.forEach(rowName => {
+                const $row = this.$table.find(`tr[data-row-name="${rowName}"]`);
+                const $inputCell = $row.find(`td input[data-column="${columnName}"]`).closest('td');
+                $inputCell.after($('<td class="probability">').html(
+                    `<input type="number" class="form-control probability-input" 
+                 data-row="${rowName}" data-column="p(${columnName})" min="0" max="1" step="0.01" />`
+                ));
+            });
+        });
+    }
+
+    removeProbabilities() {
+        if (!this.withProbabilities) {
+            return; // Вероятностей нет
+        }
+
+        this.withProbabilities = false;
+
+        // Удаляем все заголовки столбцов вероятностей
+        this.$table.find('th.probability').remove();
+
+        // Удаляем все ячейки вероятностей
+        this.$table.find('td.probability').remove();
+    }
+
+    // Остальные методы без изменений
     getTableData() {
-        const uncertainties = this.getUncertainties(); // Получаем неопределенности
-        const alternatives = this.getAlternatives(); // Получаем альтернативы
+        const uncertainties = this.getUncertainties();
+        const alternatives = this.getAlternatives();
 
         return {
             uncertainties,
@@ -121,32 +219,54 @@ class Table {
 
     // Получение списка неопределенностей
     getUncertainties() {
-        const uncertainties = [];
-        this.$table.find('thead th').each(function (index) {
-            if (index > 0) { // Пропускаем первый столбец (названия альтернатив)
-                uncertainties.push($(this).text());
-            }
-        });
-        return uncertainties;
+        return [...this.columns];
     }
-
+    
     // Получение альтернатив и их значений
     getAlternatives() {
         const alternatives = {};
+        const rows = this.$table.find('tbody tr');
 
-        this.$table.find('tbody tr').each(function () {
-            const $row = $(this);
-            const altName = $row.find('th').text(); // Название альтернативы (первая ячейка)
+        for (let i = 0; i < rows.length; i++) {
+            const $row = $(rows[i]);
+            const altName = $row.find('th').text();
             const values = [];
+            const cells = $row.find('td');
 
-            // Собираем значения для альтернативы
-            $row.find('td').each(function () {
-                const value = parseFloat($(this).find('input').val());
-                values.push(value);
-            });
+            if (this.withProbabilities) {
+                // Обрабатываем пары ячеек (значение + вероятность)
+                for (let j = 0; j < cells.length; j += 2) {
+                    const $markCell = $(cells[j]);
+                    const $probCell = $(cells[j + 1]);
+
+                    const markInput = $markCell.find('input');
+                    const probInput = $probCell?.find('input'); // Опциональная цепочка на случай нечетного количества
+                    
+                    const markValue = markInput.length ? parseFloat(markInput.val()) || 0 : 0;
+                    const probValue = probInput?.length ? parseFloat(probInput.val()) || 0 : 0;
+                    
+                    values.push({
+                        mark: markValue,
+                        probability: probValue
+                    });
+                }
+            } else {
+                // Обрабатываем все ячейки как отдельные значения
+                for (let j = 0; j < cells.length; j++) {
+                    const $cell = $(cells[j]);
+                    const $input = $cell.find('input');
+
+                    if ($input.length) {
+                        values.push({
+                            mark: parseFloat($input.val()) || 0,
+                            probability: 1
+                        });
+                    }
+                }
+            }
 
             alternatives[altName] = values;
-        });
+        }
 
         return alternatives;
     }
@@ -269,12 +389,12 @@ class CriteriaList {
 
     // Инициализация
     init() {
-        this.fillSelect(); // Заполняем select
+        this.withoutProbabilities(); // По умолчанию используем критерии без вероятностей
         this.bindEvents(); // Навешиваем обработчики событий
     }
 
     // Заполнение select
-    fillSelect() {
+    fillSelect(criterias) {
         const $select = this.$list.find('.form-select');
         $select.empty(); // Очищаем select
 
@@ -286,7 +406,7 @@ class CriteriaList {
         }));
 
         // Добавляем option из конфига
-        this.config.criterias.forEach(criteria => {
+        criterias.forEach(criteria => {
             $select.append($('<option>', {
                 value: criteria.method,
                 text: criteria.name,
@@ -316,7 +436,10 @@ class CriteriaList {
         if (selectedMethod === '') return;
 
         // Находим выбранный критерий
-        const selectedCriteria = this.config.criterias.find(criteria => criteria.method === selectedMethod);
+        let selectedCriteria = this.config.withProbabilityCriterias.find(criteria => criteria.method === selectedMethod);
+        if (selectedCriteria === undefined) {
+            selectedCriteria = this.config.withoutProbabilityCriterias.find(criteria => criteria.method === selectedMethod);
+        }
 
         // Если у критерия есть параметры, добавляем их
         if (selectedCriteria.parameters) {
@@ -369,7 +492,10 @@ class CriteriaList {
         }
 
         // Находим выбранный критерий
-        const selectedCriteria = this.config.criterias.find(criteria => criteria.method === selectedMethod);
+        let selectedCriteria = this.config.withProbabilityCriterias.find(criteria => criteria.method === selectedMethod);
+        if (selectedCriteria === undefined) {
+            selectedCriteria = this.config.withoutProbabilityCriterias.find(criteria => criteria.method === selectedMethod);
+        }
 
         // Проверяем, заполнены ли все input[type="number"]
         let isValid = true;
@@ -477,6 +603,22 @@ class CriteriaList {
 
         return data;
     }
+
+    // Переключение на критерии с вероятностями
+    withProbabilities() {
+        // Очищаем список (кроме первого элемента, который содержит select)
+        this.$list.find('li:not(:first)').remove();
+        // Заполняем select критериями с вероятностями
+        this.fillSelect(this.config.withProbabilityCriterias);
+    }
+
+    // Переключение на критерии без вероятностей
+    withoutProbabilities() {
+        // Очищаем список (кроме первого элемента, который содержит select)
+        this.$list.find('li:not(:first)').remove();
+        // Заполняем select критериями без вероятностей
+        this.fillSelect(this.config.withoutProbabilityCriterias);
+    }
 }
 
 class Solver {
@@ -508,8 +650,10 @@ class Solver {
             return;
         }
 
-        // Формируем итоговый объект
+        const isChecked = $('#toggleProbabilities').prop('checked');
+
         const data = {
+            withProbabilities: isChecked,
             mathModel: tableData,
             criterias: criteriaData,
         };
@@ -521,14 +665,14 @@ class Solver {
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
-            beforeSend: function() {
+            beforeSend: function () {
                 solveResult.append(`<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>`);
             },
-            success: function(response) {
+            success: function (response) {
                 solveResult.empty();
                 solveResult.append(response);
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function (jqXHR, textStatus, errorThrown) {
                 console.error('Ошибка при отправке данных:', textStatus, errorThrown);
                 alert('Произошла ошибка при отправке данных. Пожалуйста, попробуйте позже.');
                 solveResult.empty();
@@ -537,130 +681,44 @@ class Solver {
     }
 }
 
-class ImportExportHandler {
-    constructor(importBtnSelector, exportJsonBtnSelector, exportXmlBtnSelector, endpoints, lists) {
-        this.$importBtn = $(importBtnSelector);
-        this.$exportJsonBtn = $(exportJsonBtnSelector);
-        this.$exportXmlBtn = $(exportXmlBtnSelector);
-        this.importEndpoint = endpoints.import;
-        this.exportJsonEndpoint = endpoints.exportJson;
-        this.exportXmlEndpoint = endpoints.exportXml;
+function onExportXmlBtnClick(criteriaList, table) {
+    onExportFileSelected("/nu-export-xml", "model.xml", criteriaList, table);
+}
 
-        // Ссылки на списки
-        this.uncertaintyUl = lists.uncertaintyUl;
-        this.alternativeUl = lists.alternativeUl;
-        this.criteriaList = lists.criteriaList;
+function onExportJsonBtnClick(criteriaList, table) {
+    onExportFileSelected("/nu-export-json", "model.json", criteriaList, table);
+}
 
-        this.initEvents();
+function onExportFileSelected(url, filename, criteriaList, table) {
+    const criteriaData = criteriaList.getData(); // Получаем данные из CriteriaList
+    const tableData = table.getTableData(); // Получаем данные из Table
+
+    if (criteriaData.length === 0) {
+        return;
     }
 
-    initEvents() {
-        this.$importBtn.on('click', () => this.handleImport());
-        this.$exportJsonBtn.on('click', () => this.handleExport(this.exportJsonEndpoint));
-        this.$exportXmlBtn.on('click', () => this.handleExport(this.exportXmlEndpoint));
-    }
+    const isChecked = $('#toggleProbabilities').prop('checked');
 
-    handleImport() {
-        const $fileInput = $('<input type="file" accept=".json,.xml" style="display: none;">');
-        $('body').append($fileInput);
-
-        $fileInput.on('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append("file", file);
-
-            $.ajax({
-                url: this.importEndpoint,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: (data) => this.populateInterface(data),
-                error: () => alert("Ошибка при импорте файла. Проверьте формат и повторите попытку."),
-                complete: () => $fileInput.remove()
-            });
-        });
-
-        $fileInput.click();
-    }
-
-    handleExport(endpoint) {
-        window.open(endpoint, '_blank');
-    }
-
-    populateInterface(data) {
-        // Очистка текущих данных
-        this.clearLists();
-
-        const model = data.mathModel;
-        const criterias = data.criterias;
-
-        // Импорт неопределенностей
-        if (Array.isArray(model.uncertainties)) {
-            model.uncertainties.forEach(u => this.uncertaintyUl.addItem(u));
-        }
-
-        // Импорт альтернатив
-        if (model.alternatives && typeof model.alternatives === 'object') {
-            for (const [altName, marks] of Object.entries(model.alternatives)) {
-                this.alternativeUl.addItem(altName, marks);
-            }
-        }
-        
-        // Импорт критериев
-        if (Array.isArray(criterias)) {
-            criterias.forEach(c => {
-                const method = c.criteria;
-                const params = c.parameters || [];
-
-                const configCriteria = this.criteriaList.config.criterias.find(k => k.method === method);
-                if (!configCriteria) return;
-
-                const $newItem = $('<li>', {
-                    class: 'list-group-item d-flex justify-content-between align-items-center',
-                }).append(
-                    $('<div>', { class: 'vals' }).append(
-                        $('<p>', {
-                            class: 'name fw-bold',
-                            text: configCriteria.name,
-                            attr: { 'data-method': method },
-                        }),
-                        ...(params.map(param => {
-                            const configParam = this.criteriaList.config.parameters.find(p => p.key === Object.keys(param)[0]);
-                            const key = Object.keys(param)[0];
-                            const value = param[key];
-                            return $('<p>', {
-                                text: `${configParam ? configParam.name : key}: ${value}`,
-                                attr: {
-                                    'data-parameter': key,
-                                    'data-parameter-value': value,
-                                }
-                            });
-                        }))
-                    ),
-                    $('<div>').append(
-                        $('<button>', {
-                            type: 'button',
-                            class: 'btn btn-danger btn-sm bi bi-trash',
-                            title: 'Удалить метод',
-                            'aria-label': 'Удалить метод'
-                        })
-                    )
-                );
-
-                this.criteriaList.$list.append($newItem);
-            });
-        }
-    }
-
-    clearLists() {
-        this.uncertaintyUl.$list.empty();
-        this.uncertaintyUl.items.clear();
-        this.alternativeUl.$list.empty();
-        this.alternativeUl.items.clear();
-        this.criteriaList.$list.find('li:gt(0)').remove(); // Оставить первую li с селектом
-        this.criteriaList.table.clear(); // если есть метод очистки таблицы
-    }
+    const data = {
+        withProbabilities: isChecked,
+        mathModel: tableData,
+        criterias: criteriaData,
+    };
+    
+    $.ajax({
+        method: "POST",
+        url: url,
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        success: function (response) {
+            var blob = new Blob([response], {type: "application/octet-stream"});
+            var url2 = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url2;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+        },
+        error: function () {}
+    })
 }

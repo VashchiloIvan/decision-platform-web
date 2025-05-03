@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Xml;
 using DecisionPlatformWeb.Entity;
+using DecisionPlatformWeb.Entity.NaturalUncertainty;
 using DecisionPlatformWeb.Utils;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,5 +64,36 @@ public class ImportExportController: Controller
         }
         
         return Json(new TaskCondition());
+    }
+    
+    [HttpPost("nu-export-xml")]
+    public IActionResult NuExportXml([FromBody] RequestData taskCondition)
+    {
+        var stream = new MemoryStream();
+        XmlDocument document = new XmlDocument();
+        XmlNode xmlNode = XmlRepositoryUtils.ObjectToXml(document, taskCondition);
+        document.AppendChild(xmlNode);
+        document.Save(stream);
+    
+        stream.Position = 0;
+        var a = new FileStreamResult(stream, "text/plain")
+        {
+            FileDownloadName = "model.xml"
+        };
+        return a;
+    }
+    
+    [HttpPost("nu-export-json")]
+    public IActionResult NuExportJson([FromBody] RequestData taskCondition)
+    {
+        MemoryStream stream = new MemoryStream();
+        JsonSerializer.Serialize(stream, taskCondition);
+    
+        stream.Position = 0;
+        var a = new FileStreamResult(stream, "text/plain")
+        {
+            FileDownloadName = "model.json"
+        };
+        return a;
     }
 }
