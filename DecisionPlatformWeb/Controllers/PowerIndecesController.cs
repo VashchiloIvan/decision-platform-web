@@ -16,64 +16,11 @@ namespace DecisionPlatformWeb.Controllers
             Solver = new PowerIndecesSolver();
         }
 
-        [HttpPost("calculate/ss")]
-        public IActionResult CalculateSS([FromBody] CalculateRequest request)
+        [HttpPost("calculate")]
+        public IActionResult CalculatePowerIndeces([FromBody] CalculateRequest request)
         {
-            if (request.QuotaType == (int)QuotaType.EQUALITY)
-            {
-                if (request.CalcType == 0) {
-                    PowerIndexs powerIndeces = Solver.CalcSSDirectEquiles(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-                else
-                {
-                    PowerIndexs powerIndeces = Solver.CalcSSGenerEquiles(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-            } else
-            {
-                if (request.CalcType == 0)
-                {
-                    PowerIndexs powerIndeces = Solver.CalcSSDirectExceeding(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-                else
-                {
-                    PowerIndexs powerIndeces = Solver.CalcSSGenerExceeding(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-            }
-        }
-
-        [HttpPost("calculate/banz")]
-        public IActionResult CalculateBanz([FromBody] CalculateRequest request)
-        {
-            if (request.QuotaType == (int)QuotaType.EQUALITY)
-            {
-                if (request.CalcType == 0)
-                {
-                    PowerIndexs powerIndeces = Solver.CalcBDirectEquiles(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-                else
-                {
-                    PowerIndexs powerIndeces = Solver.CalcBGenerEquiles(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-            }
-            else
-            {
-                if (request.CalcType == 0)
-                {
-                    PowerIndexs powerIndeces = Solver.CalcBDirectExceeding(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-                else
-                {
-                    PowerIndexs powerIndeces = Solver.CalcBGenerExceeding(request.Players, request.Quota);
-                    return Json(powerIndeces);
-                }
-            }
+            Players powerIndeces = Solver.calculatePowerIndeces(request.Players, request.Quota, request.QuotaType, request.CalculationType, request.MethodType);
+            return Json(powerIndeces);
         }
     }
 }

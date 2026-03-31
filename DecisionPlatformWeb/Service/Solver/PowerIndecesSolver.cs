@@ -1,4 +1,5 @@
-﻿using PowerIndecesDecisionWrapperCsharp;
+﻿using DecisionPlatformWeb.Entity.PowerIndeces;
+using PowerIndecesDecisionWrapperCsharp;
 
 namespace DecisionPlatformWeb.Service.Solver
 {
@@ -14,44 +15,54 @@ namespace DecisionPlatformWeb.Service.Solver
             GenerCalcService = new GenerCalc();
         }
 
-        public PowerIndexs CalcSSDirectEquiles(List<Player> players, double quota)
+        private Players calculateDirection(List<Player> players, double quota, CalculateType calculateType, QuotaType quotaType)
         {
-            return DirectCalcService.powerIndexShapleyShubick(new Players(players), (int)QuotaType.EQUALITY, quota);
+            Players result = new Players();
+            switch (calculateType)
+            {
+                case CalculateType.ShapleyShupic:
+                    result = DirectCalcService.powerIndexShapleyShubick(new Players(players), (int)quotaType, quota);
+                    break;
+                case CalculateType.Banzhaf:
+                    result = DirectCalcService.powerIndexBanzhaf(new Players(players), (int)quotaType, quota);
+                    break;
+                case CalculateType.Johnson:
+                    result = DirectCalcService.powerIndexJohnson(new Players(players), (int)quotaType, quota);
+                    break;
+                default:
+                    break;
+            }
+            return result;
         }
 
-        public PowerIndexs CalcSSDirectExceeding(List<Player> players, double quota)
+        private Players calculateGeneration(List<Player> players, double quota, CalculateType calculateType, QuotaType quotaType)
         {
-            return DirectCalcService.powerIndexShapleyShubick(new Players(players), (int)QuotaType.EXCEEDING, quota);
+            Players result = new Players();
+            switch (calculateType)
+            {
+                case CalculateType.ShapleyShupic:
+                    result = GenerCalcService.powerIndexShapleyShubick(new Players(players), (int)quotaType, quota);
+                    break;
+                case CalculateType.Banzhaf:
+                    result = GenerCalcService.powerIndexBanzhaf(new Players(players), (int)quotaType, quota);
+                    break;
+                default:
+                    break;
+            }
+            return result;
         }
 
-        public PowerIndexs CalcBDirectEquiles(List<Player> players, double quota)
+        public Players calculatePowerIndeces(List<Player> players, double quota, QuotaType quotaType, CalculateType calculateType, MethodType methodType)
         {
-            return DirectCalcService.powerIndexBanzhaf(new Players(players), (int)QuotaType.EQUALITY, quota);
-        }
-
-        public PowerIndexs CalcBDirectExceeding(List<Player> players, double quota)
-        {
-            return DirectCalcService.powerIndexBanzhaf(new Players(players), (int)QuotaType.EXCEEDING, quota);
-        }
-
-        public PowerIndexs CalcSSGenerEquiles(List<Player> players, double quota)
-        {
-            return GenerCalcService.powerIndexShapleyShubick(new Players(players), (int)QuotaType.EQUALITY, quota);
-        }
-
-        public PowerIndexs CalcSSGenerExceeding(List<Player> players, double quota)
-        {
-            return GenerCalcService.powerIndexShapleyShubick(new Players(players), (int)QuotaType.EXCEEDING, quota);
-        }
-
-        public PowerIndexs CalcBGenerEquiles(List<Player> players, double quota)
-        {
-            return GenerCalcService.powerIndexBanzhaf(new Players(players), (int)QuotaType.EQUALITY, quota); 
-        }
-
-        public PowerIndexs CalcBGenerExceeding(List<Player> players, double quota)
-        {
-            return GenerCalcService.powerIndexBanzhaf(new Players(players), (int)QuotaType.EXCEEDING, quota);
+            switch (methodType)
+            {
+                case MethodType.Direction:
+                    return this.calculateDirection(players, quota, calculateType, quotaType);
+                case MethodType.Generation:
+                    return this.calculateGeneration(players, quota, calculateType, quotaType);
+                default:
+                    return new Players();
+            }
         }
     }
 }
